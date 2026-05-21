@@ -9,17 +9,15 @@ function pegarHref() {
 }
 const NAV_LINKS = [
   { label: "Início",        href: "index.html" },
-  { label: "Login",         href: "login-page.php" },
   { label: "Tutorial",      href: "tutorial-page.html" },
-  { label: "Jogo",          href: "game-page.html" },
-  { label: "Pontuação",     href: "score-page.php" },
+  { label: "Jogo",          href: "game-page.html" }
 ];
 
 //f:pegarNavLink
 function pegarNavLink(href) {
   const base = pegarHref();
   const isScreensPage = location.pathname.includes('/pages/');
-  const screenPages = ["login-page.php", "tutorial-page.html", "game-page.html", "score-page.php"];
+  const screenPages = ["tutorial-page.html", "game-page.html"];
   if (isScreensPage) {
     if (screenPages.includes(href)) {
       return href;
