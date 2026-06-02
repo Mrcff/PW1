@@ -11,28 +11,33 @@
         $senha           = trim($_POST["senha"])           ?? "";
         $confirmar_senha = trim($_POST["confirmar_senha"]) ?? "";
 
-        // Validação
+        // Validação se os campos estão vazios
         if (empty(trim($nome)) || empty(trim($email)) || empty($senha) || empty($confirmar_senha)) {
             $erro = "Preencha todos os campos.";
         } elseif ($senha !== $confirmar_senha) {
             $erro = "As senhas não conferem.";
         } else {
-            // Verificando se email digitado já existe no BD
-            $stmt_email = mysqli_prepare($conexao, "SELECT EXISTS(SELECT 1 FROM usuarios WHERE email = ?) AS email_existe;"); // Retorna 1 se email existe, e 0 se email NÃO existe
-
-            mysqli_stmt_bind_param($stmt_email, "s", $email);
-            if(mysqli_stmt_execute($stmt_email)){
-                $result = mysqli_stmt_get_result($stmt_email);
-                if($usuario = mysqli_fetch_assoc($result)){
-                    if($usuario['email_existe']){
-                        $erro = "Erro ao cadastrar: Email já cadastrado!";
-                    }
-                }
+            // Validação do email
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $erro = "Erro ao cadastrar: Por favor, insira um email válido. Por exemplo: seu-email@dominio.com";
             }else{
-                $erro = "Erro ao cadastrar: " . mysqli_stmt_error($stmt_email);
+                // Verificando se email digitado já existe no BD
+                $stmt_email = mysqli_prepare($conexao, "SELECT EXISTS(SELECT 1 FROM usuarios WHERE email = ?) AS email_existe;"); // Retorna 1 se email existe, e 0 se email NÃO existe
+    
+                mysqli_stmt_bind_param($stmt_email, "s", $email);
+                if(mysqli_stmt_execute($stmt_email)){
+                    $result = mysqli_stmt_get_result($stmt_email);
+                    if($usuario = mysqli_fetch_assoc($result)){
+                        if($usuario['email_existe']){
+                            $erro = "Erro ao cadastrar: Email já cadastrado!";
+                        }
+                    }
+                }else{
+                    $erro = "Erro ao cadastrar: " . mysqli_stmt_error($stmt_email);
+                }
+    
+                mysqli_stmt_close($stmt_email);
             }
-
-            mysqli_stmt_close($stmt_email);
             
             // Se o email digitado não existir no BD ou nenhum outro erro acontecer, o cadastro pode prosseguir
             if(empty($erro)){
