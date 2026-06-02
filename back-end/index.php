@@ -1,7 +1,7 @@
 <?php
     session_start();
 
-    $login = isset($_SESSION["usuarioId"]);
+    $login = isset($_SESSION["usuario_id"]);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -11,7 +11,7 @@
     <title>Sistema de Login</title>
 </head>
 <body>
-    <h1>Bem-vindo<?= $login ? ", " . htmlspecialchars($_SESSION["usuarioNome"]) : "!" ?></h1>
+    <h1>Bem-vindo<?= $login ? ", " . htmlspecialchars($_SESSION["usuario_nome"]) : "!" ?></h1>
 
     <?php if ($login): ?>
         <p>Você está autenticado no sistema.</p>

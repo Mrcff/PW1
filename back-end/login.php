@@ -2,7 +2,7 @@
     session_start();
 
     // Se já estiver logado, redireciona para o painel
-    if (isset($_SESSION["usuarioId"])) {
+    if (isset($_SESSION["usuario_id"])) {
         header("Location: index.php");
         exit;
     }
@@ -12,10 +12,10 @@
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         require_once __DIR__ . "/conexao.php";
 
-        $email = $_POST["email"] ?? "";
-        $senha = $_POST["senha"] ?? "";
+        $email = trim($_POST["email"]) ?? "";
+        $senha = trim($_POST["senha"]) ?? "";
 
-        if (empty($email) || empty($senha)) {
+        if (empty(trim($email)) || empty(trim($senha))) {
             $erro = "Preencha todos os campos.";
         } else {
             // Prepared Statement para buscar o usuário pelo email
@@ -29,8 +29,8 @@
                 if (password_verify($senha, $usuario["senha"])) {
                     // Login bem-sucedido — regenera ID e grava sessão
                     session_regenerate_id(true);
-                    $_SESSION["usuarioId"]   = $usuario["id"];
-                    $_SESSION["usuarioNome"] = $usuario["nome"];
+                    $_SESSION["usuario_id"]   = $usuario["id"];
+                    $_SESSION["usuario_nome"] = $usuario["nome"];
 
                     mysqli_stmt_close($stmt);
                     mysqli_close($conexao);
