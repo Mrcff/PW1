@@ -16,6 +16,7 @@
     <?php if ($login): ?>
         <p>Você está autenticado no sistema.</p>
         <ul>
+            <li><a href="editar.php">Editar Dados</a></li>
             <li><a href="logout.php">Sair</a></li>
         </ul>
     <?php else: ?>
