@@ -12,10 +12,10 @@
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         require_once __DIR__ . "/conexao.php";
 
-        $email = trim($_POST["email"]) ?? "";
-        $senha = trim($_POST["senha"]) ?? "";
+        $email = trim($_POST["email"] ?? "");
+        $senha = trim($_POST["senha"] ?? "");
 
-        if (empty(trim($email)) || empty(trim($senha))) {
+        if (empty($email) || empty($senha)) {
             $erro = "Preencha todos os campos.";
         } else {
             // Prepared Statement para buscar o usuário pelo email
@@ -43,7 +43,8 @@
             // Login falhou (email não encontrado OU senha incorreta)
             $erro = "Email ou senha inválidos.";
             mysqli_stmt_close($stmt);
-            mysqli_close($conexao);
+            
+        mysqli_close($conexao);
         }
     }
 ?>
