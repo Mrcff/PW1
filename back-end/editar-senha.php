@@ -10,17 +10,23 @@
 
     $erro = "";
  
+    // Executa quando o usuário clica no botão de submit
     if($_SERVER["REQUEST_METHOD"] === "POST"){
+        // Coletando os dados dos campos
         $senha_atual     = trim($_POST["senha_atual"]     ?? "");
         $nova_senha      = trim($_POST["nova_senha"]      ?? "");
         $confirmar_senha = trim($_POST["confirmar_senha"] ?? "");
 
+        // Validação de campos vazios
         if(empty($senha_atual) || empty($nova_senha) || empty($confirmar_senha)){
             $erro = "Preencha todos os campos";
+        // Validação do tamanho da senha, sendo o mínimo 8 caracteres
         } elseif(strlen($nova_senha) < 8){
             $erro = "Senha muito pequena. Digite pelo menos 8 caracteres";
+        // Validação de nova senha igual ao confirmar senha
         } elseif($nova_senha !== $confirmar_senha){
             $erro = "As senhas não conferem.";
+        // Validação se a senha atual digitada é a mesma do usuário no BD
         } elseif(!empty($senha_atual)){
             $stmt = mysqli_prepare($conexao, "SELECT senha FROM usuarios WHERE id = ?");
             mysqli_stmt_bind_param($stmt, "i", $_SESSION["usuario_id"]);
@@ -39,6 +45,7 @@
             mysqli_stmt_close($stmt);
         }
 
+        // Se não tiver nenhum erro, altera as senhas no BD
         if(empty($erro)){
             $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
