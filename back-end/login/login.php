@@ -10,7 +10,7 @@
     $erro = "";
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        require_once __DIR__ . "/conexao.php";
+        require_once __DIR__ . "/banco/conexao.php";
 
         $email = trim($_POST["email"]) ?? "";
         $senha = trim($_POST["senha"]) ?? "";
