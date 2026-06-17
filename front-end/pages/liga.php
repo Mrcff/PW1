@@ -21,11 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
 
     if (empty($nome) || empty($palavraChave)) {
         $erro = "Nome e palavra-chave são obrigatórios.";
-
     } else {
         $stmt = mysqli_prepare($conexao,
-            "INSERT INTO liga (nome, palavraChave, criador_id, dataFim)
-             VALUES (?, ?, ?, ?)"
+            "INSERT INTO liga (nome, palavraChave, criador_id, dataFim) VALUES (?, ?, ?, ?)"
         );
         $dataFimFinal = empty($dataFim) ? null : $dataFim;
         mysqli_stmt_bind_param($stmt, "ssis", $nome, $palavraChave, $usuario_id, $dataFimFinal);
@@ -38,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
             }
         } else {
             $liga_id = mysqli_insert_id($conexao);
-            // Criador entra automaticamente
             $stmt2 = mysqli_prepare($conexao,
                 "INSERT INTO ligaUsuario (liga_id, usuario_id) VALUES (?, ?)"
             );
@@ -51,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     }
 }
 
-// entra na liga
+// entrar na liga
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "entrar") {
 
     $palavraChave = trim($_POST["palavraChave"] ?? "");
@@ -59,7 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     if (empty($palavraChave)) {
         $erro = "Informe a palavra-chave da liga.";
     } else {
-        // Busca a liga pela palavra-chave
         $stmt = mysqli_prepare($conexao, "SELECT id, nome FROM liga WHERE palavraChave = ?");
         mysqli_stmt_bind_param($stmt, "s", $palavraChave);
         mysqli_stmt_execute($stmt);
@@ -70,21 +66,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
         if (!$liga) {
             $erro = "Palavra-chave inválida.";
         } else {
-            // verifica se já participa da liga
-            $stmtCheck = mysqli_prepare($conexao, "SELECT 1 FROM ligaUsuario WHERE liga_id = ? AND usuario_id = ?");
-            mysqli_stmt_bind_param( $stmtCheck,"ii",$liga["id"],$usuario_id);
-
+            $stmtCheck = mysqli_prepare($conexao,
+                "SELECT 1 FROM ligaUsuario WHERE liga_id = ? AND usuario_id = ?"
+            );
+            mysqli_stmt_bind_param($stmtCheck, "ii", $liga["id"], $usuario_id);
             mysqli_stmt_execute($stmtCheck);
-
             $resultCheck = mysqli_stmt_get_result($stmtCheck);
 
             if (mysqli_num_rows($resultCheck) > 0) {
                 $erro = "Você já participa dessa liga.";
             } else {
-                $stmt2 = mysqli_prepare( $conexao, "INSERT INTO ligaUsuario (liga_id, usuario_id) VALUES (?, ?)");
-                mysqli_stmt_bind_param($stmt2,"ii", $liga["id"],$usuario_id);
+                $stmt2 = mysqli_prepare($conexao,
+                    "INSERT INTO ligaUsuario (liga_id, usuario_id) VALUES (?, ?)"
+                );
+                mysqli_stmt_bind_param($stmt2, "ii", $liga["id"], $usuario_id);
                 mysqli_stmt_execute($stmt2);
-                $mensagem = "Você entrou na liga " .htmlspecialchars($liga["nome"]) . "!";
+                $mensagem = "Você entrou na liga " . htmlspecialchars($liga["nome"]) . "!";
                 mysqli_stmt_close($stmt2);
             }
             mysqli_stmt_close($stmtCheck);
@@ -92,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     }
 }
 
-// procura por ligas que o usuario esta
+// busca ligas do usuário
 $stmtLigas = mysqli_prepare($conexao,
     "SELECT l.id, l.nome, l.dataCriacao, l.dataFim
      FROM liga l
@@ -108,6 +105,12 @@ while ($l = mysqli_fetch_assoc($resultLigas)) {
     $ligas[] = $l;
 }
 mysqli_stmt_close($stmtLigas);
+
+// reabre modal se houve erro ao criar
+$reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
+    && isset($_POST["acao"])
+    && $_POST["acao"] === "criar"
+    && !empty($erro));
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -115,6 +118,7 @@ mysqli_stmt_close($stmtLigas);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ligas</title>
+    <link rel="stylesheet" href="../css/liga.css">
 </head>
 <body>
 
@@ -128,52 +132,75 @@ mysqli_stmt_close($stmtLigas);
     <p style="color: green;"><?= htmlspecialchars($mensagem) ?></p>
 <?php endif; ?>
 
-<!-- CRIAR LIGA -->
-<h2>Criar nova liga</h2>
-<form method="post" action="liga.php">
-    <input type="hidden" name="acao" value="criar">
+<!-- Botão que abre o modal -->
+<div class="acoes-topo">
+    <a href="../index.html" class="btn-primario">Voltar para Inicial</a>
+    <button class="btn-primario" onclick="abrirModal()">+ Criar liga</button>
+</div>
 
-    <label for="nome">Nome da liga:</label><br>
-    <input type="text" id="nome" name="nome" required><br><br>
+<!-- ── MODAL CRIAR LIGA ── -->
+<div class="modal-overlay <?= $reabrirModal ? 'aberto' : '' ?>" id="modalCriar">
+    <div class="modal">
+        <button class="modal-fechar" onclick="fecharModal()" aria-label="Fechar">&times;</button>
+        <p class="modal-titulo">Criar nova liga</p>
 
-    <label for="palavraChave">Palavra-chave (para convidar membros):</label><br>
-    <input type="text" id="palavraChave" name="palavraChave" required><br><br>
+        <form method="post" action="liga.php">
+            <input type="hidden" name="acao" value="criar">
 
-    <label for="dataFim">Data de encerramento (opcional):</label><br>
-    <input type="date" id="dataFim" name="dataFim"><br><br>
+            <div class="campo">
+                <label for="nome">Nome da liga</label>
+                <input type="text" id="nome" name="nome"
+                       value="<?= htmlspecialchars($_POST['nome'] ?? '') ?>" required>
+            </div>
 
-    <button type="submit">Criar liga</button>
-</form>
+            <div class="campo">
+                <label for="palavraChave">Palavra-chave para convidar membros</label>
+                <input type="text" id="palavraChave" name="palavraChave"
+                       value="<?= htmlspecialchars($_POST['palavraChave'] ?? '') ?>" required>
+            </div>
+
+            <div class="campo">
+                <label for="dataFim">Data de encerramento <span style="font-weight:400;text-transform:none">(opcional)</span></label>
+                <input type="date" id="dataFim" name="dataFim"
+                       value="<?= htmlspecialchars($_POST['dataFim'] ?? '') ?>">
+            </div>
+
+            <button type="submit" class="btn-primario">Criar liga</button>
+        </form>
+    </div>
+</div>
 
 <hr>
 
-<!-- ENTRAR EM LIGA -->
-<h2>Entrar em uma liga</h2>
-<form method="post" action="liga.php">
-    <input type="hidden" name="acao" value="entrar">
-
-    <label for="palavraChaveEntrar">Palavra-chave da liga:</label><br>
-    <input type="text" id="palavraChaveEntrar" name="palavraChave" required><br><br>
-
-    <button type="submit">Entrar na liga</button>
-</form>
-
-<hr>
-
-<!-- LIGAS DO USUÁRIO E RANKINGS -->
-<h2>Suas ligas</h2>
+<!-- ── SUAS LIGAS ── -->
+<p class="secao-titulo">Suas ligas</p>
 
 <?php if (empty($ligas)): ?>
-    <p>Você ainda não participa de nenhuma liga.</p>
+    <p class="vazio">Você ainda não participa de nenhuma liga.</p>
 <?php else: ?>
+
     <?php foreach ($ligas as $liga): ?>
-        <h3><?= htmlspecialchars($liga["nome"]) ?></h3>
-        <p>Criada em: <?= $liga["dataCriacao"] ?></p>
+    <div class="liga-card">
+
+        <p class="liga-nome"><?= htmlspecialchars($liga["nome"]) ?></p>
+        <p class="liga-info">Criada em: <?= $liga["dataCriacao"] ?></p>
         <?php if ($liga["dataFim"]): ?>
-            <p>Encerra em: <?= $liga["dataFim"] ?></p>
+            <p class="liga-info">Encerra em: <?= $liga["dataFim"] ?></p>
         <?php endif; ?>
+
+        <!-- Entrar em uma liga (inline) -->
+        <form class="form-entrar" method="post" action="liga.php">
+            <input type="hidden" name="acao" value="entrar">
+            <div class="campo">
+                <label for="palavraChaveEntrar">Entrar em outra liga — palavra-chave</label>
+                <input type="text" id="palavraChaveEntrar" name="palavraChave"
+                       placeholder="Digite a palavra-chave" required>
+            </div>
+            <button type="submit" class="btn-primario">Entrar</button>
+        </form>
+
+        <!-- Ranking geral -->
         <?php
-        // Ranking total (desde a criação da liga)
         $stmtRank = mysqli_prepare($conexao,
             "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
              FROM ligaUsuario lu
@@ -189,21 +216,25 @@ mysqli_stmt_close($stmtLigas);
         $resRank = mysqli_stmt_get_result($stmtRank);
         ?>
 
-        <h4>Ranking geral da liga</h4>
-        <table border="1" cellpadding="6">
-            <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
-            <?php $pos = 1; while ($row = mysqli_fetch_assoc($resRank)): ?>
+        <p class="ranking-titulo">Ranking geral</p>
+        <table>
+            <thead>
+                <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
+            </thead>
+            <tbody>
+                <?php $pos = 1; while ($row = mysqli_fetch_assoc($resRank)): ?>
                 <tr>
                     <td><?= $pos++ ?></td>
                     <td><?= htmlspecialchars($row["nome"]) ?></td>
                     <td><?= $row["total"] ?></td>
                 </tr>
-            <?php endwhile; ?>
+                <?php endwhile; ?>
+            </tbody>
         </table>
         <?php mysqli_stmt_close($stmtRank); ?>
 
+        <!-- Ranking semanal -->
         <?php
-        // Ranking semanal (últimos 7 dias)
         $stmtSem = mysqli_prepare($conexao,
             "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
              FROM ligaUsuario lu
@@ -219,25 +250,52 @@ mysqli_stmt_close($stmtLigas);
         $resSem = mysqli_stmt_get_result($stmtSem);
         ?>
 
-        <h4>Ranking semanal da liga</h4>
-        <table border="1" cellpadding="6">
-            <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
-            <?php $pos = 1; while ($row = mysqli_fetch_assoc($resSem)): ?>
+        <p class="ranking-titulo">Ranking semanal</p>
+        <table>
+            <thead>
+                <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
+            </thead>
+            <tbody>
+                <?php $pos = 1; while ($row = mysqli_fetch_assoc($resSem)): ?>
                 <tr>
                     <td><?= $pos++ ?></td>
                     <td><?= htmlspecialchars($row["nome"]) ?></td>
                     <td><?= $row["total"] ?></td>
                 </tr>
-            <?php endwhile; ?>
+                <?php endwhile; ?>
+            </tbody>
         </table>
-        <?php
-        mysqli_stmt_close($stmtSem);
-        ?>
+        <?php mysqli_stmt_close($stmtSem); ?>
 
-        <hr>
-    <?php endforeach; 
-        mysqli_close($conexao);?>
-    <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+    <?php mysqli_close($conexao); ?>
+
+<?php endif; ?>
+
+<script>
+    const overlay = document.getElementById('modalCriar');
+
+    function abrirModal() {
+        overlay.classList.add('aberto');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModal() {
+        overlay.classList.remove('aberto');
+        document.body.style.overflow = '';
+    }
+
+    // fecha clicando fora do modal
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) fecharModal();
+    });
+
+    // fecha com Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') fecharModal();
+    });
+</script>
 
 </body>
 </html>
