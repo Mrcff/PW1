@@ -12,13 +12,14 @@ const NAV_LINKS = [
   { label: "Início", href: "index.html" },
   { label: "Tutorial", href: "tutorial.php" },
   { label: "Jogo", href: "game.php" },
+  { label: "Liga", href: "liga.php" },
 ];
 
 //f:pegarNavLink
 function pegarNavLink(href) {
   const base = pegarHref();
   const isScreensPage = location.pathname.includes("/pages/");
-  const screenPages = ["tutorial.php", "game.php"];
+  const screenPages = ["tutorial.php", "game.php", "liga.php"];
   if (isScreensPage) {
     if (screenPages.includes(href)) {
       return href;
