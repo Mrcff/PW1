@@ -10,7 +10,7 @@
     <body>
         <div class="page-header">
             <h1>Bem-vindo!</h1>
-            <p>Este é tutorial.html</p>
+            <p>Este é tutorial.php</p>
         </div>
     </body>
 </html>
