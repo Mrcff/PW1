@@ -18,6 +18,7 @@
         <ul>
             <li><a href="logout.php">Sair</a></li>
         </ul>
+        <li><a href="../../front-end/pages/liga.php">Ir para ligas</a></li>
     <?php else: ?>
         <p>Você não está logado.</p>
         <ul>
