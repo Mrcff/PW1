@@ -5,18 +5,18 @@
 //f:pegarHref
 function pegarHref() {
   const path = location.pathname;
-  return path.includes('/pages/') ? '../' : './';
+  return path.includes("/pages/") ? "../" : "./";
 }
 const NAV_LINKS = [
-  { label: "Início",        href: "index.html" },
-  { label: "Tutorial",      href: "tutorial.html" },
-  { label: "Jogo",          href: "game.html" }
+  { label: "Início", href: "index.html" },
+  { label: "Tutorial", href: "tutorial.html" },
+  { label: "Jogo", href: "game.html" },
 ];
 
 //f:pegarNavLink
 function pegarNavLink(href) {
   const base = pegarHref();
-  const isScreensPage = location.pathname.includes('/pages/');
+  const isScreensPage = location.pathname.includes("/pages/");
   const screenPages = ["tutorial.html", "game.html"];
   if (isScreensPage) {
     if (screenPages.includes(href)) {
@@ -32,7 +32,7 @@ function pegarNavLink(href) {
 
 //f:pegarHrefPagina
 function pegarHrefPagina(pageName) {
-  const isScreensPage = location.pathname.includes('/pages/');
+  const isScreensPage = location.pathname.includes("/pages/");
   if (isScreensPage) {
     return pageName;
   }
@@ -52,7 +52,7 @@ function injetarHeader() {
         </div>
       </a>
       <nav class="header-nav">
-      ${NAV_LINKS.map(link => {
+      ${NAV_LINKS.map((link) => {
         const navHref = pegarNavLink(link.href);
         const ativo = link.href === currentPage ? "active" : "";
         return `<a href="${navHref}" class="${ativo}">${link.label}</a>`;
@@ -67,4 +67,4 @@ function injetarHeader() {
 
 window.addEventListener("load", () => {
   injetarHeader();
-  });
+});
