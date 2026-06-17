@@ -95,6 +95,6 @@
         <button type="submit">Criar usuário</button>
     </form>
 
-    <p><a href="index.php">Voltar</a> | <a href="login.php">Fazer login</a></p>
+    <p><a href="../../front-end/index.php">Voltar</a> | <a href="login.php">Fazer login</a></p>
 </body>
 </html>

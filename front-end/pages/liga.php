@@ -6,6 +6,7 @@ if (!isset($_SESSION["usuario_id"])) {
     exit;
 }
 
+require_once "menu.php";
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
 
 $usuario_id = $_SESSION["usuario_id"];
@@ -134,7 +135,7 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
 
 <!-- Botão que abre o modal -->
 <div class="acoes-topo">
-    <a href="../index.html" class="btn-primario">Voltar para Inicial</a>
+    <a href="../index.php" class="btn-primario">Voltar para Inicial</a>
     <button class="btn-primario" onclick="abrirModal()">+ Criar liga</button>
 </div>
 

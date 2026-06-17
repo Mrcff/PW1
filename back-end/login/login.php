@@ -3,7 +3,7 @@
 
     // Se já estiver logado, redireciona para o painel
     if (isset($_SESSION["usuario_id"])) {
-        header("Location: index.php");
+        header("Location: ../../front-end/index.php");
         exit;
     }
 
@@ -71,6 +71,6 @@
         <button type="submit">Entrar</button>
     </form>
 
-    <p><a href="index.php">Voltar</a> | <a href="cadastrar.php">Cadastrar-se</a></p>
+    <p><a href="../../front-end/index.php">Voltar</a> | <a href="cadastrar.php">Cadastrar-se</a></p>
 </body>
 </html>

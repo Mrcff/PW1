@@ -9,7 +9,7 @@ function pegarHref() {
 }
 
 const NAV_LINKS = [
-  { label: "Início", href: "index.html" },
+  { label: "Início", href: "index.php" },
   { label: "Tutorial", href: "tutorial.php" },
   { label: "Jogo", href: "game.php" },
   { label: "Liga", href: "liga.php" },
@@ -43,11 +43,11 @@ function pegarHrefPagina(pageName) {
 
 //f:injetarHeader
 function injetarHeader() {
-  const currentPage = location.pathname.split("/").pop() || "index.html";
+  const currentPage = location.pathname.split("/").pop() || "index.php";
   const header = document.createElement("header");
   header.className = "site-header";
   header.innerHTML = `
-      <a href="${pegarNavLink("index.html")}" class="header-logo">
+      <a href="${pegarNavLink("index.php")}" class="header-logo">
         <div>
           <div class="header-logo-text">Café do TADS</div>
           <div class="header-logo-sub">Games & Codes</div>
