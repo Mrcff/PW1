@@ -6,9 +6,9 @@
         <title>Game</title>
         <link rel="stylesheet" href="../css/pages-styles.css">
         <link rel="stylesheet" href="../css/game-styles.css">
-        <script src="../scripts/pages-script.js" defer></script>
+        <script src="../scripts/pages.js" defer></script>
         <script src="../data/game-objects.js" defer></script>
-        <script src="../scripts/game-script.js" defer></script>
+        <script src="../scripts/game.js" defer></script>
     </head>
     <body>
         <main class="tela-jogo">

@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tutorial</title>
         <link rel="stylesheet" href="../css/pages-styles.css">
-        <link rel="icon" href="../assets/icons/favicon.ico">
         <script src="../scripts/pages-script.js" defer></script>
     </head>
     <body>
