@@ -6,7 +6,6 @@ if (!isset($_SESSION["usuario_id"])) {
     exit;
 }
 
-require_once __DIR__ . "/../components/menu.php";
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
 
 $usuario_id = $_SESSION["usuario_id"];
@@ -122,6 +121,7 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
     <link rel="stylesheet" href="../css/liga.css">
 </head>
 <body>
+<? php require_once __DIR__ . "/../components/menu.php"; ?>
 
 <h1>Ligas</h1>
 
@@ -175,7 +175,19 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
 
 <!-- ── SUAS LIGAS ── -->
 <p class="secao-titulo">Suas ligas</p>
-
+<div class="liga-card">
+    <div class="card-entrar">
+        <form class="form-entrar" method="post" action="liga.php">
+            <input type="hidden" name="acao" value="entrar">
+            <div class="campo">
+                <label for="palavraChaveEntrar">Entrar em uma liga — palavra-chave</label>
+                <input type="text" id="palavraChaveEntrar" name="palavraChave"
+                    placeholder="Digite a palavra-chave" required>
+            </div>
+            <button type="submit" class="btn-primario">Entrar</button>
+        </form>
+    </div>
+</div>
 <?php if (empty($ligas)): ?>
     <p class="vazio">Você ainda não participa de nenhuma liga.</p>
 <?php else: ?>
@@ -188,17 +200,6 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
         <?php if ($liga["dataFim"]): ?>
             <p class="liga-info">Encerra em: <?= $liga["dataFim"] ?></p>
         <?php endif; ?>
-
-        <!-- Entrar em uma liga (inline) -->
-        <form class="form-entrar" method="post" action="liga.php">
-            <input type="hidden" name="acao" value="entrar">
-            <div class="campo">
-                <label for="palavraChaveEntrar">Entrar em outra liga — palavra-chave</label>
-                <input type="text" id="palavraChaveEntrar" name="palavraChave"
-                       placeholder="Digite a palavra-chave" required>
-            </div>
-            <button type="submit" class="btn-primario">Entrar</button>
-        </form>
 
         <!-- Ranking geral -->
         <?php

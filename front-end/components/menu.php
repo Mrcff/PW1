@@ -17,7 +17,7 @@ $base = "/trabalhoWeb/PW1/front-end/";
     <div class="header-right">
         <?php if (isset($_SESSION["usuario_id"])): ?>
             <span>Olá, <?= htmlspecialchars($_SESSION["usuario_nome"]) ?></span>
-            <a href="../back-end/login/logout.php">Sair</a>
+            <a href="../../back-end/login/logout.php">Sair</a>
         <?php else: ?>
             <a href="../back-end/login/login.php">Login</a>
         <?php endif; ?>

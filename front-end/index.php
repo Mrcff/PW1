@@ -27,7 +27,7 @@
         <ul>
             <li><a href="../back-end/login/logout.php">Sair</a></li>
             <li><a href="./pages/liga.php">Ir para ligas</a></li>
-            <li><a href="editar.php">Editar Dados</a></li>
+            <li><a href="../back-end/login/editar.php">Editar Dados</a></li>
         </ul>
     <?php else: ?>
         <p>Você não está logado.</p>
