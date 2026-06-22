@@ -1,3 +1,6 @@
+<?php
+$base = "/trabalhoWeb/PW1/front-end/";
+?>
 <header class="site-header">
 
     <a href="index.php" class="header-logo">
@@ -5,10 +8,10 @@
     </a>
 
     <nav class="header-nav">
-        <a href="../index.php">Início</a>
-        <a href="tutorial.php">Tutorial</a>
-        <a href="game.php">Jogo</a>
-        <a href="liga.php">Liga</a>
+        <a href="<?= $base ?>index.php">Início</a>
+        <a href="<?= $base ?>pages/tutorial.php">Tutorial</a>
+        <a href="<?= $base ?>pages/game.php">Jogo</a>
+        <a href="<?= $base ?>pages/liga.php">Liga</a>
     </nav>
 
     <div class="header-right">

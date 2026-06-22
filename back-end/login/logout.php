@@ -1,6 +1,12 @@
 <?php
     session_start();
 
+    $login = $_SESSION['usuario_id'];
+    if(!$login){
+        header('Location: ../../front-end/index.php');
+        exit;
+    }
+
     // Limpa variáveis da sessão
     $_SESSION = [];
 

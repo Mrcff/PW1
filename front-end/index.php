@@ -1,6 +1,5 @@
 <?php
     session_start();
-
     $login = isset($_SESSION["usuario_id"]);
 ?>
 
@@ -12,11 +11,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto Final Web I</title>
     <link rel="stylesheet" href="css/pages-styles.css">
-    <script src="./scripts/pages.js" defer></script>
 
 </head>
 
 <body>
+    <?php require_once __DIR__ . "/components/menu.php"; ?>
     <div class="page-header">
         <h1>Bem-vindo!</h1>
         <p>Este é um site.</p>
@@ -28,6 +27,7 @@
         <ul>
             <li><a href="../back-end/login/logout.php">Sair</a></li>
             <li><a href="./pages/liga.php">Ir para ligas</a></li>
+            <li><a href="editar.php">Editar Dados</a></li>
         </ul>
     <?php else: ?>
         <p>Você não está logado.</p>

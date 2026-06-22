@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once "menu.php";
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -10,11 +9,12 @@ require_once "menu.php";
         <title>Game</title>
         <link rel="stylesheet" href="../css/pages-styles.css">
         <link rel="stylesheet" href="../css/game-styles.css">
-        <script src="../scripts/pages.js" defer></script>
         <script src="../data/game-objects.js" defer></script>
         <script src="../scripts/game.js" defer></script>
     </head>
     <body>
+        <?php require_once __DIR__ . "/../components/menu.php"; ?>
+
         <main class="tela-jogo">
 <!-- HUD =================================================== -->
             <section class="jogo-hud">

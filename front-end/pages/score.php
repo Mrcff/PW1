@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "menu.php";
+require_once __DIR__ "/../components/menu.php";
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

@@ -6,13 +6,13 @@
     $email  = "";
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $nome            = trim($_POST["nome"])            ?? "";
-        $email           = trim($_POST["email"])           ?? "";
-        $senha           = trim($_POST["senha"])           ?? "";
-        $confirmar_senha = trim($_POST["confirmar_senha"]) ?? "";
+        $nome            = trim($_POST["nome"]            ?? "");
+        $email           = trim($_POST["email"]           ?? "");
+        $senha           = trim($_POST["senha"]           ?? "");
+        $confirmar_senha = trim($_POST["confirmar_senha"] ?? "");
 
         // Validação se os campos estão vazios
-        if (empty(trim($nome)) || empty(trim($email)) || empty($senha) || empty($confirmar_senha)) {
+        if (empty($nome) || empty($email) || empty($senha) || empty($confirmar_senha)) {
             $erro = "Preencha todos os campos.";
         // Validação do tamanho de caracteres no campo nome
         } elseif (strlen($nome) > 255){

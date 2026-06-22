@@ -2,11 +2,11 @@
 session_start();
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../../back-end/login/login.php");
     exit;
 }
 
-require_once "menu.php";
+require_once __DIR__ . "/../components/menu.php";
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
 
 $usuario_id = $_SESSION["usuario_id"];

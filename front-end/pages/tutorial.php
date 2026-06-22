@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "menu.php";
+require_once __DIR__ . "/../components/menu.php";
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -9,9 +9,9 @@ require_once "menu.php";
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tutorial</title>
         <link rel="stylesheet" href="../css/pages-styles.css">
-        <script src="../scripts/pages.js" defer></script>
     </head>
     <body>
+        <?php require_once __DIR__ . "/../components/menu.php"; ?>
         <div class="page-header">
             <h1>Bem-vindo!</h1>
             <p>Este é tutorial.php</p>
