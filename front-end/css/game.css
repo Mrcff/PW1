@@ -286,8 +286,9 @@
 
 .mesa-restaurante {
   position: absolute;
-  width: 146px;
-  height: 112px;
+  width: clamp(68px, 26%, 146px);
+  height: auto;
+  aspect-ratio: 146 / 112;
   padding: 0;
   border: 0;
   background: transparent;

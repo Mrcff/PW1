@@ -1,5 +1,5 @@
 <?php
-$base = "/trabalhoWeb/PW1/front-end/";
+$base = "/PW1/front-end/";
 ?>
 <header class="site-header">
 

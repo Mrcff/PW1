@@ -9,7 +9,7 @@ if (!isset($_SESSION["usuario_id"])) {
 
 header("Content-Type: application/json");
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
-require_once __DIR__ . "/../../back-end/banco/liga-oficial.php";
+require_once __DIR__ . "/../../back-end/liga/liga-oficial.php";
 
 $dados = json_decode(file_get_contents("php://input"), true);
 

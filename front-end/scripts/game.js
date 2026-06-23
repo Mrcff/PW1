@@ -1,5 +1,6 @@
-//obj:jogoEstado
 // Estados: "inicio" | "salao" | "pedindo" | "pausado" | "entre-levels" | "gameover"
+//cod2319
+//obj:jogoEstado
 const jogoEstado = {
   level: 1,
   score: 0,
@@ -17,19 +18,20 @@ const jogoEstado = {
   parametrosLevel: null,
   cenarioAtual: null,
   ultimoCenarioId: null,
-  loopAtivo: false,
+  resizePendente: false,
   garcom: {
     xRatio: 0.1,
     yRatio: 0.6,
     x: 84,
     y: 275,
-    speed: 3,
+    speed: 4,
   },
   keys: new Set(),
   mesas: [],
   dialogoTimers: [],
-  spawnTimers: [],
+  spawnAgendados: [],
   spawnInterval: null,
+  loopRodando: false
 };
 
 //====================
@@ -249,6 +251,7 @@ function cooldownSpawn(baseMs) {
   return baseMs - delta + Math.floor(Math.random() * (delta * 2 + 1));
 }
 
+//cod2319
 //f:criarLevel
 function criarLevel(level, sortearNovoCenario = false) {
   limparTimersLevel();
@@ -286,9 +289,10 @@ function criarLevel(level, sortearNovoCenario = false) {
   atualizarHUD();
   cozinha.classList.remove("entregue");
 
-  window.setTimeout(() => tentarSpawnProximo(), 1200);
+  agendarSpawn(tentarSpawnProximo, 1200);
 }
 
+//cod2319
 //f:tentarSpawnProximo
 function tentarSpawnProximo() {
   if (jogoEstado.clientesNaFila <= 0) return;
@@ -302,11 +306,7 @@ function tentarSpawnProximo() {
   }).length;
 
   if (ativos >= params.maxClientesSimultaneos) {
-    const t = window.setTimeout(
-      () => tentarSpawnProximo(),
-      cooldownSpawn(params.cooldownSpawnMs),
-    );
-    jogoEstado.spawnTimers.push(t);
+    agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
     return;
   }
 
@@ -316,11 +316,7 @@ function tentarSpawnProximo() {
   });
 
   if (!mesaLivre) {
-    const t = window.setTimeout(
-      () => tentarSpawnProximo(),
-      cooldownSpawn(params.cooldownSpawnMs),
-    );
-    jogoEstado.spawnTimers.push(t);
+    agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
     return;
   }
 
@@ -334,25 +330,58 @@ function tentarSpawnProximo() {
   spawnCliente(mesaLivre, params);
 
   if (jogoEstado.clientesNaFila > 0) {
-    const t = window.setTimeout(
-      () => tentarSpawnProximo(),
-      cooldownSpawn(params.cooldownSpawnMs),
-    );
-    jogoEstado.spawnTimers.push(t);
-  }
+        agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
+    }
 }
 
 //f:limparTimersLevel
 function limparTimersLevel() {
-  jogoEstado.spawnTimers.forEach((t) => window.clearTimeout(t));
-  jogoEstado.spawnTimers = [];
-  if (jogoEstado.spawnInterval) {
-    window.clearInterval(jogoEstado.spawnInterval);
-    jogoEstado.spawnInterval = null;
-  }
+  // Limpa a fila de spawns usada pela pausa e retomada do jogo.
+  jogoEstado.spawnAgendados.forEach((spawn) => {
+    if (spawn.timerId !== null) window.clearTimeout(spawn.timerId);
+  });
+  jogoEstado.spawnAgendados = [];
   jogoEstado.mesas.forEach((m) => {
     if (m.pacienciaTimer) window.clearInterval(m.pacienciaTimer);
   });
+}
+
+//cod2319
+//f:agendarSpawn
+function agendarSpawn(fn, delayMs) {
+    const entrada = { timerId: null, disparoEm: Date.now() + delayMs, fn };
+    entrada.timerId = window.setTimeout(() => {
+        jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((s) => s !== entrada);
+        fn();
+    }, delayMs);
+    jogoEstado.spawnAgendados.push(entrada);
+}
+
+//cod2319
+//f:pausarSpawns
+function pausarSpawns() {
+    const agora = Date.now();
+    jogoEstado.spawnAgendados.forEach((s) => {
+        window.clearTimeout(s.timerId);
+        s.timerId = null;
+        s.restanteMs = Math.max(0, s.disparoEm - agora);
+    });
+}
+
+//cod2319
+//f:retornarSpawns
+function retornarSpawns() {
+    const pendentes = [...jogoEstado.spawnAgendados];
+    jogoEstado.spawnAgendados = [];
+    pendentes.forEach((s) => {
+        const delay = s.restanteMs ?? 0;
+        const entrada = { timerId: null, disparoEm: Date.now() + delay, fn: s.fn };
+        entrada.timerId = window.setTimeout(() => {
+            jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((x) => x !== entrada);
+            entrada.fn();
+        }, delay);
+        jogoEstado.spawnAgendados.push(entrada);
+    });
 }
 
 //f:spawnCliente
@@ -510,36 +539,68 @@ function tentarNovamenteFase() {
 
 //f:criarMesasFisicas
 function criarMesasFisicas(quant) {
+  const chaoRect = chao.getBoundingClientRect();
+  const cozinhaRect = cozinha.getBoundingClientRect();
   const posicoes = [];
-  const distanciaMin = 0.24;
+  const margem = 8;
+  const larguraMesa = Math.min(146, Math.max(68, chaoRect.width * 0.26));
+  const alturaMesa = larguraMesa * (112 / 146);
+  const maxX = Math.max(margem, chaoRect.width - larguraMesa - margem);
+  const maxY = Math.max(margem, chaoRect.height - alturaMesa - margem);
+  const areaCozinha = {
+    x: cozinhaRect.left - chaoRect.left - margem,
+    y: cozinhaRect.top - chaoRect.top - margem,
+    largura: cozinhaRect.width + margem * 2,
+    altura: cozinhaRect.height + margem * 2,
+  };
+
+  function sobrepoe(x, y, area) {
+    return (
+      x < area.x + area.largura &&
+      x + larguraMesa > area.x &&
+      y < area.y + area.altura &&
+      y + alturaMesa > area.y
+    );
+  }
+
+  function posicaoDisponivel(x, y) {
+    return !sobrepoe(x, y, areaCozinha) && !posicoes.some((posicao) =>
+      sobrepoe(x, y, posicao),
+    );
+  }
+
   let tentativas = 0;
   while (posicoes.length < quant && tentativas < 800) {
-    const c = {
-      xRatio: 0.08 + Math.random() * 0.78,
-      yRatio: 0.12 + Math.random() * 0.66,
-    };
-    // O balcão ocupa o canto superior direito do piso xadrez.
-    const ocupaAreaDoBalcao = c.xRatio > 0.64 && c.yRatio < 0.5;
-    if (
-      !ocupaAreaDoBalcao &&
-      posicoes.every(
-        (p) =>
-          Math.hypot(p.xRatio - c.xRatio, p.yRatio - c.yRatio) >= distanciaMin,
-      )
-    )
-      posicoes.push(c);
+    const x = margem + Math.random() * (maxX - margem);
+    const y = margem + Math.random() * (maxY - margem);
+    if (posicaoDisponivel(x, y)) {
+      posicoes.push({ x, y, largura: larguraMesa, altura: alturaMesa });
+    }
     tentativas++;
   }
-  while (posicoes.length < quant) {
-    const i = posicoes.length;
-    posicoes.push({
-      xRatio: 0.1 + (i % 3) * 0.24,
-      yRatio: 0.52 + Math.floor(i / 3) * 0.2,
-    });
+
+  // Grade de segurança para cenários muito pequenos, como em zoom alto.
+  let indiceGrade = 0;
+  while (posicoes.length < quant && indiceGrade < 24) {
+    const i = indiceGrade++;
+    const colunas = 3;
+    const linha = Math.floor(i / colunas);
+    const coluna = i % colunas;
+    const x = margem + coluna * ((maxX - margem) / Math.max(1, colunas - 1));
+    const y = margem + linha * (alturaMesa + margem);
+    if (posicaoDisponivel(x, Math.min(y, maxY))) {
+      posicoes.push({
+        x,
+        y: Math.min(y, maxY),
+        largura: larguraMesa,
+        altura: alturaMesa,
+      });
+    }
   }
   return posicoes.map((pos, i) => ({
     id: `mesa-${jogoEstado.level}-${i + 1}`,
-    ...pos,
+    xRatio: pos.x / chaoRect.width,
+    yRatio: pos.y / chaoRect.height,
     ocupada: false,
     pedidoRecebido: false,
     entregue: false,
@@ -557,10 +618,13 @@ function criarMesasFisicas(quant) {
 //f:posicaoMesas
 function posicaoMesas() {
   const r = chao.getBoundingClientRect();
+  const margem = 8;
   jogoEstado.mesas.forEach((mesa) => {
     const mr = mesa.element.getBoundingClientRect();
-    mesa.x = garimpar(r.width * mesa.xRatio, 16, r.width - mr.width - 16);
-    mesa.y = garimpar(r.height * mesa.yRatio, 16, r.height - mr.height - 16);
+    const maxX = Math.max(margem, r.width - mr.width - margem);
+    const maxY = Math.max(margem, r.height - mr.height - margem);
+    mesa.x = garimpar(r.width * mesa.xRatio, margem, maxX);
+    mesa.y = garimpar(r.height * mesa.yRatio, margem, maxY);
     mesa.element.style.left = `${mesa.x}px`;
     mesa.element.style.top = `${mesa.y}px`;
   });
@@ -648,6 +712,7 @@ function atualizarBotao() {
   interactBtn.onclick = acao.action;
 }
 
+//cod2319
 //f:controlesJogo
 function controlesJogo() {
   if (jogoEstado.modo === "salao") {
@@ -662,7 +727,15 @@ function controlesJogo() {
     atualizarPosicaoGarcom();
     atualizarBotao();
   }
-  requestAnimationFrame(controlesJogo);
+  if (jogoEstado.loopRodando) requestAnimationFrame(controlesJogo);
+}
+
+//cod2319
+//f:iniciarLoop
+function iniciarLoop() {
+    if (jogoEstado.loopRodando) return;
+    jogoEstado.loopRodando = true;
+    requestAnimationFrame(controlesJogo);
 }
 
 //f:renderizarDialogo
@@ -718,6 +791,7 @@ function iniciarPedido(mesa) {
   window.setTimeout(() => pedidoInput.focus(), 120);
 }
 
+//cod2319
 //f:cancelarPedido
 function cancelarPedido() {
   const mesa = jogoEstado.mesaAtualCancelavel;
@@ -770,21 +844,32 @@ function cancelarPedido() {
   retornarBarras();
   cenarioPedido.classList.add("hidden");
   cenarioSala.classList.remove("hidden");
+  if (jogoEstado.resizePendente) {
+    jogoEstado.resizePendente = false;
+    posicaoMesas();
+    recalcularPosicaoGarcomAposResize();
+  }
   atualizarBotao();
 }
 
+//cod2319
 //f:finalizarPedido
 function finalizarPedido() {
-  jogoEstado.modo = "salao";
-  jogoEstado.segurandoPedido = true;
-  jogoEstado.score += 100;
-  jogoEstado.mesaAtualCancelavel = null;
-  cenarioPedido.classList.add("hidden");
-  cenarioSala.classList.remove("hidden");
-  feedbackAnotacao.textContent = "Pedido anotado.";
-  retornarBarras();
-  atualizarHUD();
-  atualizarBotao();
+    jogoEstado.modo = "salao";
+    jogoEstado.segurandoPedido = true;
+    jogoEstado.score += 100;
+    jogoEstado.mesaAtualCancelavel = null;
+    cenarioPedido.classList.add("hidden");
+    cenarioSala.classList.remove("hidden");
+    feedbackAnotacao.textContent = "Pedido anotado.";
+    retornarBarras();
+    if (jogoEstado.resizePendente) {
+        jogoEstado.resizePendente = false;
+        posicaoMesas();
+        recalcularPosicaoGarcomAposResize();
+    }
+    atualizarHUD();
+    atualizarBotao();
 }
 
 //f:entregarPedido
@@ -894,41 +979,47 @@ function bloquearCola() {
   });
 }
 
+//cod2319
 //f:abrirPausa
 function abrirPausa() {
   jogoEstado.modo = "pausado";
   jogoEstado.keys.clear();
   pausarBarras();
+  pausarSpawns(); //essa chamada de função
   pausaModal.classList.remove("hidden");
 }
 
+//cod2319
 //f:fecharPausa
 function fecharPausa() {
   pausaModal.classList.add("hidden");
   jogoEstado.modo = "salao";
   retornarBarras();
+  retornarSpawns(); //essa chamada de função
 }
 
 //f:reiniciarLevel
 function reiniciarLevel() {
   pausaModal.classList.add("hidden");
   limparTimersLevel();
+  jogoEstado.modo = "salao";
   jogoEstado.score = jogoEstado.scoreInicioLevel;
   jogoEstado.garcom.x = 84;
   jogoEstado.garcom.y = 275;
   jogoEstado.garcom.xRatio = 0.1;
   jogoEstado.garcom.yRatio = 0.6;
-  jogoEstado.modo = "salao";
   criarLevel(jogoEstado.level);
   atualizarPosicaoGarcom();
   atualizarBotao();
 }
 
+//cod2319
 //f:sairParaInicio
 function sairParaInicio() {
   pausaModal.classList.add("hidden");
   limparTimersLevel();
   jogoEstado.modo = "inicio";
+  jogoEstado.loopRodando = false; //foi só essa linha
   jogoEstado.keys.clear();
   jogoHud.classList.add("hidden");
   cenarioSala.classList.add("hidden");
@@ -939,6 +1030,7 @@ function sairParaInicio() {
   limparPartidaLocal();
 }
 
+//cod2319
 //f:iniciarJogo
 function iniciarJogo() {
   limparPartidaLocal();
@@ -960,10 +1052,8 @@ function iniciarJogo() {
   criarLevel(jogoEstado.level);
   atualizarPosicaoGarcom();
   atualizarBotao();
-  if (!jogoEstado.loopAtivo) {
-    jogoEstado.loopAtivo = true;
-    requestAnimationFrame(controlesJogo);
-  }
+  // Inicia somente um loop de animação, evitando aumento de velocidade ao reentrar no jogo.
+  iniciarLoop();
 }
 
 //f:reiniciarJogo
@@ -1013,13 +1103,20 @@ async function salvarPontuacao(pontuacao, nivel) {
 // EVENTOS
 //========================
 
+//cod2319
 window.addEventListener("resize", () => {
+  if (cenarioSala.classList.contains("hidden")) {
+    jogoEstado.resizePendente = true;
+    return;
+  }
   posicaoMesas();
   recalcularPosicaoGarcomAposResize();
 });
 
 window.addEventListener("pagehide", salvarPartidaLocal);
 
+
+//cod2319
 window.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
 
@@ -1031,11 +1128,10 @@ window.addEventListener("keydown", (event) => {
   }
 
   if (key === " " || key === "spacebar") {
-    if (
-      jogoEstado.modo === "salao" &&
-      !interactBtn.classList.contains("hidden")
-    ) {
-      event.preventDefault();
+    if (jogoEstado.modo === "pedindo") return;
+    const modoAtivo = ["salao", "pausado", "entre-levels", "gameover"];
+    if (modoAtivo.includes(jogoEstado.modo)) event.preventDefault();
+    if (jogoEstado.modo === "salao" && !interactBtn.classList.contains("hidden")) {
       interactBtn.click();
     }
     return;
@@ -1086,9 +1182,8 @@ function iniciarCarrosselDicas() {
 
 window.addEventListener("load", () => {
   bloquearCola();
-  if (restaurarPartidaLocal() && !jogoEstado.loopAtivo) {
-    jogoEstado.loopAtivo = true;
-    requestAnimationFrame(controlesJogo);
+  if (restaurarPartidaLocal()) {
+    iniciarLoop();
   } else {
     atualizarHUD();
   }

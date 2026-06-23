@@ -7,7 +7,7 @@ if (!isset($_SESSION["usuario_id"])) {
 }
 
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
-require_once __DIR__ . "/../../back-end/banco/liga-oficial.php";
+require_once __DIR__ . "/../../back-end/liga/liga-oficial.php";
 
 $usuario_id = $_SESSION["usuario_id"];
 $ligaJogoId = garantirLigaOficial($conexao);
@@ -141,6 +141,7 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
 <!-- Botão que abre o modal -->
 <div class="acoes-topo">
     <a href="../index.php" class="btn-primario">Voltar para Inicial</a>
+    <a href="historicoRelatorio.php" class="btn-primario">Histórico e relatório</a>
     <button class="btn-primario" onclick="abrirModal()">+ Criar liga</button>
 </div>
 
