@@ -397,3 +397,28 @@ table th:last-child {
     flex-direction: column;
   }
 }
+
+/* Tema compartilhado: café, vinho e azul como detalhe. */
+body {
+  background: #f4eadf;
+  color: #35251b;
+  padding-top: 56px;
+}
+
+body::before { background: linear-gradient(90deg, #63452f, #fba256, #ab3535); }
+h1 { color: #63452f; }
+h1::after { color: #fba256; }
+.btn-primario { background: #ab3535; box-shadow: 0 3px 10px rgba(99, 69, 47, .3); }
+.btn-primario:hover { background: #f44242; box-shadow: 0 6px 16px rgba(171, 53, 53, .32); }
+.modal, .form-entrar, table { background: #fffaf4; border-color: #e2ccb4; }
+.modal-titulo, .liga-nome, table td:last-child, table th:last-child { color: #63452f; }
+.campo label, .secao-titulo, table thead th { color: #765238; }
+.campo input[type="text"], .campo input[type="date"] { border-color: #e2ccb4; background: #fffdf9; color: #35251b; }
+.campo input:focus { border-color: #ab3535; box-shadow: 0 0 0 3px rgba(171, 53, 53, .16); }
+.ranking-titulo { color: #4874bf; }
+.ranking-titulo::after { background: #c0a484; }
+table thead th { background: #eadbc9; }
+table td:first-child, table th:first-child { color: #ab3535; }
+table tbody tr:first-child td:first-child { color: #fba256; }
+table tbody tr:first-child td { background: rgba(251, 162, 86, .12); }
+table tbody tr:hover td { background: #f8eee3; }

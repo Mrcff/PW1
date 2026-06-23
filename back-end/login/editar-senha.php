@@ -71,24 +71,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editando Senha</title>
+    <link rel="stylesheet" href="../../front-end/css/auth.css">
 </head>
-<body>
-    <h1>Editando Senha</h1>
+<body class="auth-page">
+    <main class="auth-shell">
+    <section class="auth-card">
+    <h1>Alterar senha</h1>
+    <p class="auth-subtitle">Use uma senha com pelo menos 8 caracteres.</p>
     <?php if ($erro): ?>
-        <p style="color: red;"><?= htmlspecialchars($erro) ?></p>
+        <p class="auth-error"><?= htmlspecialchars($erro) ?></p>
     <?php endif; ?>
-    <form action="editar-senha.php" method="post">
-        <label for="senha_atual">Senha Atual:</label><br>
-        <input type="password" id="senha_atual" name="senha_atual" required><br><br>
+    <form class="auth-form" action="editar-senha.php" method="post">
+        <label for="senha_atual">Senha atual</label>
+        <input type="password" id="senha_atual" name="senha_atual" required>
 
-        <label for="nova_senha">Nova senha:</label><br>
-        <input type="password" id="nova_senha" name="nova_senha" required><br><br>
+        <label for="nova_senha">Nova senha</label>
+        <input type="password" id="nova_senha" name="nova_senha" required>
 
-        <label for="confirmar_senha">Confirmar senha:</label><br>
-        <input type="password" id="confirmar_senha" name="confirmar_senha" required><br><br>
+        <label for="confirmar_senha">Confirmar nova senha</label>
+        <input type="password" id="confirmar_senha" name="confirmar_senha" required>
 
-        <button type="submit">Salvar Alterações</button>
+        <button class="auth-button" type="submit">Salvar alterações</button>
     </form>
-    <a href="editar.php">Voltar</a>
+    <p class="auth-links"><a href="editar.php">Voltar para minha conta</a></p>
+    </section>
+    </main>
 </body>
 </html>

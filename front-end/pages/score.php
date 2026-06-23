@@ -1,21 +1,41 @@
 <?php
 session_start();
-require_once __DIR__ "/../components/menu.php";
+
+if (!isset($_SESSION["usuario_id"])) {
+    http_response_code(401);
+    echo json_encode(["erro" => "Não autenticado"]);
+    exit;
+}
+
+header("Content-Type: application/json");
+require_once __DIR__ . "/../../back-end/banco/conexao.php";
+require_once __DIR__ . "/../../back-end/banco/liga-oficial.php";
+
+$dados = json_decode(file_get_contents("php://input"), true);
+
+$pontuacao = intval($dados["pontuacao"] ?? 0);
+$nivel     = intval($dados["nivel"]     ?? 1);
+
+if ($pontuacao <= 0) {
+    echo json_encode(["erro" => "Pontuação inválida"]);
+    exit;
+}
+
+$usuario_id = $_SESSION["usuario_id"];
+$ligaJogoId = garantirLigaOficial($conexao);
+incluirUsuarioNaLigaOficial($conexao, $ligaJogoId, $usuario_id);
+
+$stmt = mysqli_prepare($conexao,
+    "INSERT INTO partida (usuario_id, pontuacao, nivel) VALUES (?, ?, ?)"
+);
+mysqli_stmt_bind_param($stmt, "iii", $usuario_id, $pontuacao, $nivel);
+
+if (mysqli_stmt_execute($stmt)) {
+    echo json_encode(["ok" => true, "partida_id" => mysqli_insert_id($conexao)]);
+} else {
+    echo json_encode(["erro" => "Erro ao salvar partida"]);
+}
+
+mysqli_stmt_close($stmt);
+mysqli_close($conexao);
 ?>
-<!DOCTYPE html>
-<html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Pontuação</title>
-        <link rel="stylesheet" href="../css/estilos-globais.css">
-        <link rel="icon" href="../assets/icons/favicon.ico">
-        <script src="../scripts/script.js" defer></script>
-    </head>
-    <body>
-        <div class="page-header">
-            <h1>Bem-vindo!</h1>
-            <p>Este é score.php</p>
-        </div>
-    </body>
-</html>

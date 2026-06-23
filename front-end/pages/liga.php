@@ -7,8 +7,11 @@ if (!isset($_SESSION["usuario_id"])) {
 }
 
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
+require_once __DIR__ . "/../../back-end/banco/liga-oficial.php";
 
 $usuario_id = $_SESSION["usuario_id"];
+$ligaJogoId = garantirLigaOficial($conexao);
+incluirUsuarioNaLigaOficial($conexao, $ligaJogoId, $usuario_id);
 $mensagem   = "";
 $erro       = "";
 
@@ -95,7 +98,7 @@ $stmtLigas = mysqli_prepare($conexao,
      FROM liga l
      INNER JOIN ligaUsuario lu ON lu.liga_id = l.id
      WHERE lu.usuario_id = ?
-     ORDER BY l.dataCriacao DESC"
+     ORDER BY (l.id = $ligaJogoId) DESC, l.dataCriacao DESC"
 );
 mysqli_stmt_bind_param($stmtLigas, "i", $usuario_id);
 mysqli_stmt_execute($stmtLigas);
@@ -118,10 +121,12 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ligas</title>
+    <link rel="stylesheet" href="../css/pages.css">
     <link rel="stylesheet" href="../css/liga.css">
 </head>
 <body>
-<? php require_once __DIR__ . "/../components/menu.php"; ?>
+
+<?php require_once __DIR__ . "/../components/menu.php"; ?>
 
 <h1>Ligas</h1>
 
@@ -201,19 +206,30 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
             <p class="liga-info">Encerra em: <?= $liga["dataFim"] ?></p>
         <?php endif; ?>
 
+        <?php $ehLigaDoJogo = (int) $liga["id"] === $ligaJogoId; ?>
         <!-- Ranking geral -->
         <?php
-        $stmtRank = mysqli_prepare($conexao,
-            "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
-             FROM ligaUsuario lu
-             INNER JOIN usuarios u ON u.id = lu.usuario_id
-             LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
-                 AND p.dataPartida >= ?
-             WHERE lu.liga_id = ?
-             GROUP BY u.id, u.nome
-             ORDER BY total DESC"
-        );
-        mysqli_stmt_bind_param($stmtRank, "si", $liga["dataCriacao"], $liga["id"]);
+        if ($ehLigaDoJogo) {
+            $stmtRank = mysqli_prepare($conexao,
+                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                 FROM usuarios u
+                 LEFT JOIN partida p ON p.usuario_id = u.id
+                 GROUP BY u.id, u.nome
+                 ORDER BY total DESC"
+            );
+        } else {
+            $stmtRank = mysqli_prepare($conexao,
+                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                 FROM ligaUsuario lu
+                 INNER JOIN usuarios u ON u.id = lu.usuario_id
+                 LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
+                     AND p.dataPartida >= ?
+                 WHERE lu.liga_id = ?
+                 GROUP BY u.id, u.nome
+                 ORDER BY total DESC"
+            );
+            mysqli_stmt_bind_param($stmtRank, "si", $liga["dataCriacao"], $liga["id"]);
+        }
         mysqli_stmt_execute($stmtRank);
         $resRank = mysqli_stmt_get_result($stmtRank);
         ?>
@@ -237,17 +253,28 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
 
         <!-- Ranking semanal -->
         <?php
-        $stmtSem = mysqli_prepare($conexao,
-            "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
-             FROM ligaUsuario lu
-             INNER JOIN usuarios u ON u.id = lu.usuario_id
-             LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
-                 AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-             WHERE lu.liga_id = ?
-             GROUP BY u.id, u.nome
-             ORDER BY total DESC"
-        );
-        mysqli_stmt_bind_param($stmtSem, "i", $liga["id"]);
+        if ($ehLigaDoJogo) {
+            $stmtSem = mysqli_prepare($conexao,
+                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                 FROM usuarios u
+                 LEFT JOIN partida p ON p.usuario_id = u.id
+                     AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                 GROUP BY u.id, u.nome
+                 ORDER BY total DESC"
+            );
+        } else {
+            $stmtSem = mysqli_prepare($conexao,
+                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                 FROM ligaUsuario lu
+                 INNER JOIN usuarios u ON u.id = lu.usuario_id
+                 LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
+                     AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                 WHERE lu.liga_id = ?
+                 GROUP BY u.id, u.nome
+                 ORDER BY total DESC"
+            );
+            mysqli_stmt_bind_param($stmtSem, "i", $liga["id"]);
+        }
         mysqli_stmt_execute($stmtSem);
         $resSem = mysqli_stmt_get_result($stmtSem);
         ?>

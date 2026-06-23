@@ -54,24 +54,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="../../front-end/css/auth.css">
 </head>
-<body>
-    <h1>Login</h1>
+<body class="auth-page">
+    <main class="auth-shell">
+    <section class="auth-card">
+    <h1>Entrar</h1>
+    <p class="auth-subtitle">Acesse sua conta para continuar jogando.</p>
 
     <?php if ($erro): ?>
-        <p style="color: red;"><?= htmlspecialchars($erro) ?></p>
+        <p class="auth-error"><?= htmlspecialchars($erro) ?></p>
     <?php endif; ?>
 
-    <form method="post" action="login.php">
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
+    <form class="auth-form" method="post" action="login.php">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
 
-        <label for="senha">Senha:</label><br>
-        <input type="password" id="senha" name="senha" required><br><br>
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required>
 
-        <button type="submit">Entrar</button>
+        <button class="auth-button" type="submit">Entrar</button>
     </form>
 
-    <p><a href="../../front-end/index.php">Voltar</a> | <a href="cadastrar.php">Cadastrar-se</a></p>
+    <p class="auth-links"><a href="../../front-end/index.php">Voltar ao início</a><a href="cadastrar.php">Criar conta</a></p>
+    </section>
+    </main>
 </body>
 </html>

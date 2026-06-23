@@ -14,15 +14,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Dados</title>
+    <link rel="stylesheet" href="../../front-end/css/auth.css">
 </head>
-<body>
-    <h1>Editando Dados</h1>
-    <ul>
-        <li><a href="editar-nome-email.php
-        ">Editar Nome/Email</a></li>
-        <li><a href="editar-senha.php
-        ">Editar Senha</a></li>
-        <li><a href="../../front-end/index.php">Voltar</a></li>
-    </ul>
+<body class="auth-page">
+    <main class="auth-shell">
+    <section class="auth-card">
+    <h1>Minha conta</h1>
+    <p class="auth-subtitle">Escolha quais informações deseja alterar.</p>
+    <nav class="auth-menu" aria-label="Opções de edição">
+        <a class="auth-link-button" href="editar-nome-email.php">Editar nome e email</a>
+        <a class="auth-link-button" href="editar-senha.php">Alterar senha</a>
+        <a class="auth-link-button auth-secondary" href="../../front-end/index.php">Voltar ao início</a>
+    </nav>
+    </section>
+    </main>
 </body>
 </html>

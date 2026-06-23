@@ -43,6 +43,16 @@ const pedidos = [
 //obj:availiacoes
 const avaliacoes = [
   {
+    "estrelas": 0,
+    "comentarios": [
+      "Esperamos tanto e ninguém apareceu.",
+      "Péssimo atendimento. Nunca mais.",
+      "Fui embora de fome. Inaceitável.",
+      "Cadê o garçom? Desisto.",
+      "Zero estrelas e ainda estou sendo gentil."
+    ]
+  },
+  {
     "estrelas": 1,
     "comentarios": [
       "Faltou tômpero.",

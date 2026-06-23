@@ -114,24 +114,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editando Nome/Email</title>
+    <link rel="stylesheet" href="../../front-end/css/auth.css">
 </head>
-<body>
-    <h1>Editando Nome/Email</h1>
+<body class="auth-page">
+    <main class="auth-shell">
+    <section class="auth-card">
+    <h1>Dados pessoais</h1>
+    <p class="auth-subtitle">Confirme sua senha atual para salvar as alterações.</p>
     <?php if ($erro): ?>
-        <p style="color: red;"><?= htmlspecialchars($erro) ?></p>
+        <p class="auth-error"><?= htmlspecialchars($erro) ?></p>
     <?php endif; ?>
-    <form method="post" action="editar-nome-email.php">
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($nome) ?>" required><br><br>
+    <form class="auth-form" method="post" action="editar-nome-email.php">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($nome) ?>" required>
 
-        <label for="email">Email:</label><br>
-        <input type="text" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required><br><br>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
 
-        <label for="senha">Senha Atual(para confimar as alterações):</label><br>
-        <input type="password" id="senha" name="senha" value><br><br>
+        <label for="senha">Senha atual</label>
+        <input type="password" id="senha" name="senha" required>
 
-        <button type="submit">Salvar Alterações</button>
+        <button class="auth-button" type="submit">Salvar alterações</button>
     </form>
-    <a href="editar.php">Voltar</a>
+    <p class="auth-links"><a href="editar.php">Voltar para minha conta</a></p>
+    </section>
+    </main>
 </body>
 </html>

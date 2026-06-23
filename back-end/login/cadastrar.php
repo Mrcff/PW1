@@ -52,7 +52,11 @@
             mysqli_stmt_bind_param($stmt, "sss", $nome, $email, $senha_hash);
 
             if (mysqli_stmt_execute($stmt)) {
+                $usuario_id = mysqli_insert_id($conexao);
                 mysqli_stmt_close($stmt);
+                require_once __DIR__ . "/../banco/liga-oficial.php";
+                $ligaJogoId = garantirLigaOficial($conexao);
+                incluirUsuarioNaLigaOficial($conexao, $ligaJogoId, $usuario_id);
                 mysqli_close($conexao);
                 header("Location: login.php");
                 exit;
@@ -71,30 +75,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="../../front-end/css/auth.css">
 </head>
-<body>
-    <h1>Cadastro</h1>
+<body class="auth-page">
+    <main class="auth-shell">
+    <section class="auth-card">
+    <h1>Criar conta</h1>
+    <p class="auth-subtitle">Cadastre-se para salvar sua pontuação e participar das ligas.</p>
 
     <?php if ($erro): ?>
-        <p style="color: red;"><?= htmlspecialchars($erro) ?></p>
+        <p class="auth-error"><?= htmlspecialchars($erro) ?></p>
     <?php endif; ?>
 
-    <form method="post" action="cadastrar.php">
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($nome) ?>" required><br><br>
+    <form class="auth-form" method="post" action="cadastrar.php">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($nome) ?>" required>
 
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required><br><br>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
 
-        <label for="senha">Senha:</label><br>
-        <input type="password" id="senha" name="senha" required><br><br>
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required>
 
-        <label for="confirmar_senha">Confirmação da Senha:</label><br>
-        <input type="password" id="confirmar_senha" name="confirmar_senha" required><br><br>
+        <label for="confirmar_senha">Confirmação da senha</label>
+        <input type="password" id="confirmar_senha" name="confirmar_senha" required>
 
-        <button type="submit">Criar usuário</button>
+        <button class="auth-button" type="submit">Criar conta</button>
     </form>
 
-    <p><a href="../../front-end/index.php">Voltar</a> | <a href="login.php">Fazer login</a></p>
+    <p class="auth-links"><a href="../../front-end/index.php">Voltar ao início</a><a href="login.php">Já tenho conta</a></p>
+    </section>
+    </main>
 </body>
 </html>
