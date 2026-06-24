@@ -2,6 +2,30 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* Largura controlada do jogo: cresce moderadamente e não excede a viewport. */
+  --game-width: min(clamp(400px, 42vw, 760px), calc(100vw - 32px));
+}
+
+/* Em viewports baixas, preserva o cenário inteiro sem criar rolagem vertical. */
+@media (max-height: 1250px) {
+  :root {
+    --game-width: min(clamp(400px, 38vw, 700px), calc(100vw - 32px));
+  }
+}
+
+@media (max-height: 1150px) {
+  :root {
+    --game-width: min(clamp(400px, 37vw, 560px), calc(100vw - 32px));
+  }
+}
+
+@media (max-height: 900px) {
+  :root {
+    --game-width: min(clamp(320px, 31vw, 400px), calc(100vw - 32px));
+  }
+}
+
 .tela-jogo {
   width: min(1080px, calc(100% - 32px));
   margin: 28px auto 48px;
@@ -116,7 +140,7 @@
 
 /* HUD */
 .jogo-hud {
-  width: min(100%, max(280px, calc((100dvh - 230px) * 3 / 4)));
+  width: var(--game-width);
   margin-inline: auto;
   min-height: 60px;
   display: flex;
@@ -190,7 +214,7 @@
 .cenario-sala {
   min-height: 0;
   aspect-ratio: 3 / 4;
-  width: min(100%, max(280px, calc((100dvh - 230px) * 3 / 4)));
+  width: var(--game-width);
   margin-inline: auto;
   background-color: #211810;
   background-position: center;
