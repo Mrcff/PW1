@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: "Times New Roman", Times, serif;
   background-color: #f0e8d5;
   color: #5c4a32;
   min-height: 100vh;
@@ -89,7 +89,7 @@ p[style*="color: green"],
   padding: 11px 28px;
   background: linear-gradient(135deg, #d4a84b, #c9953a);
   color: #fff;
-  font-family: "Nunito", sans-serif;
+  font-family: "Times New Roman", Times, serif;
   font-size: 0.9rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -203,7 +203,7 @@ p[style*="color: green"],
   border-radius: 8px;
   background: #f7f2e8;
   color: #5c4a32;
-  font-family: "Nunito", sans-serif;
+  font-family: "Times New Roman", Times, serif;
   font-size: 0.95rem;
   outline: none;
   transition:
@@ -405,20 +405,69 @@ body {
   padding-top: 56px;
 }
 
-body::before { background: linear-gradient(90deg, #63452f, #fba256, #ab3535); }
-h1 { color: #63452f; }
-h1::after { color: #fba256; }
-.btn-primario { background: #ab3535; box-shadow: 0 3px 10px rgba(99, 69, 47, .3); }
-.btn-primario:hover { background: #f44242; box-shadow: 0 6px 16px rgba(171, 53, 53, .32); }
-.modal, .form-entrar, table { background: #fffaf4; border-color: #e2ccb4; }
-.modal-titulo, .liga-nome, table td:last-child, table th:last-child { color: #63452f; }
-.campo label, .secao-titulo, table thead th { color: #765238; }
-.campo input[type="text"], .campo input[type="date"] { border-color: #e2ccb4; background: #fffdf9; color: #35251b; }
-.campo input:focus { border-color: #ab3535; box-shadow: 0 0 0 3px rgba(171, 53, 53, .16); }
-.ranking-titulo { color: #4874bf; }
-.ranking-titulo::after { background: #c0a484; }
-table thead th { background: #eadbc9; }
-table td:first-child, table th:first-child { color: #ab3535; }
-table tbody tr:first-child td:first-child { color: #fba256; }
-table tbody tr:first-child td { background: rgba(251, 162, 86, .12); }
-table tbody tr:hover td { background: #f8eee3; }
+body::before {
+  background: linear-gradient(90deg, #63452f, #fba256, #ab3535);
+}
+h1 {
+  color: #63452f;
+}
+h1::after {
+  color: #fba256;
+}
+.btn-primario {
+  background: #ab3535;
+  box-shadow: 0 3px 10px rgba(99, 69, 47, 0.3);
+}
+.btn-primario:hover {
+  background: #f44242;
+  box-shadow: 0 6px 16px rgba(171, 53, 53, 0.32);
+}
+.modal,
+.form-entrar,
+table {
+  background: #fffaf4;
+  border-color: #e2ccb4;
+}
+.modal-titulo,
+.liga-nome,
+table td:last-child,
+table th:last-child {
+  color: #63452f;
+}
+.campo label,
+.secao-titulo,
+table thead th {
+  color: #765238;
+}
+.campo input[type="text"],
+.campo input[type="date"] {
+  border-color: #e2ccb4;
+  background: #fffdf9;
+  color: #35251b;
+}
+.campo input:focus {
+  border-color: #ab3535;
+  box-shadow: 0 0 0 3px rgba(171, 53, 53, 0.16);
+}
+.ranking-titulo {
+  color: #4874bf;
+}
+.ranking-titulo::after {
+  background: #c0a484;
+}
+table thead th {
+  background: #eadbc9;
+}
+table td:first-child,
+table th:first-child {
+  color: #ab3535;
+}
+table tbody tr:first-child td:first-child {
+  color: #fba256;
+}
+table tbody tr:first-child td {
+  background: rgba(251, 162, 86, 0.12);
+}
+table tbody tr:hover td {
+  background: #f8eee3;
+}

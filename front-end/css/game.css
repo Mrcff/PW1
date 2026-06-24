@@ -30,7 +30,7 @@
   width: min(1080px, calc(100% - 32px));
   margin: 28px auto 48px;
   color: #f8efe1;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 /* TELA DE INÍCIO */
@@ -277,29 +277,14 @@
   transition: transform 0.04s linear;
 }
 
-.doutor::before {
-  content: "";
+.garcom-sprite {
   position: absolute;
-  left: 13px;
-  top: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #f0c39a;
-  border: 2px solid #2c2018;
-}
-
-.doutor::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  top: 24px;
-  width: 28px;
-  height: 40px;
-  border-radius: 10px 10px 4px 4px;
-  background: #f7f1e8;
-  border: 2px solid #2c2018;
-  box-shadow: inset 0 -16px 0 #202020;
+  inset: 0;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  image-rendering: pixelated;
+  transform-origin: center;
 }
 
 /*MESAS E CLIENTES*/
@@ -374,22 +359,22 @@
 
 .cliente {
   position: absolute;
-  left: 56px;
-  top: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #e7b78f;
-  border: 3px solid #2c2018;
+  left: 30%;
+  top: -45%;
+  width: 40%;
+  aspect-ratio: 0.78;
+  background-position: 50% 0;
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  image-rendering: pixelated;
+  pointer-events: none;
   transition:
     opacity 0.35s ease,
     transform 0.35s ease;
 }
 
-/* Cliente rude tem borda vermelha */
+/* Cliente rude mantém seu sprite, apenas recebe o destaque de perigo. */
 .cliente.rude {
-  background: #e7a08f;
-  border-color: #7a1a1a;
   box-shadow: 0 0 0 2px #c94040;
 }
 
@@ -674,37 +659,16 @@
   height: 350px;
 }
 
-.cliente-head {
+.cliente-retrato {
   position: absolute;
-  left: 146px;
-  top: 28px;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: #f0c39a;
-  border: 4px solid #1f1510;
-}
-
-.cliente-body {
-  position: absolute;
-  left: 119px;
-  top: 112px;
-  width: 146px;
-  height: 176px;
-  border-radius: 45px 45px 12px 12px;
-  background: #5a6d84;
-  border: 4px solid #1f1510;
-}
-
-.mesa-pedido {
-  position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
   bottom: 0;
-  height: 118px;
-  border-radius: 50% 50% 22px 22px;
-  background: #d1ae79;
-  border: 5px solid #1f1510;
+  width: min(300px, 100%);
+  max-height: 280px;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: pixelated;
 }
 
 .caderneta {

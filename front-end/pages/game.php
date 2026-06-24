@@ -15,6 +15,7 @@ if (!isset($_SESSION["usuario_id"])) {
         <link rel="stylesheet" href="../css/game.css">
         <link rel="stylesheet" href="../css/pages.css">
         <script src="../data/cenarios.js" defer></script>
+        <script src="../data/personagens.js" defer></script>
         <script src="../scripts/game.js" defer></script>
         <script src="../data/game-objects.js" defer></script>
     </head>
@@ -72,7 +73,9 @@ if (!isset($_SESSION["usuario_id"])) {
                     <div class="mesa-layer" id="mesa-layer"></div>
                     <img class="arvore-cenario arvore-esquerda" id="arvore-esquerda" alt="">
                     <img class="arvore-cenario arvore-direita" id="arvore-direita" alt="">
-                    <div class="doutor" id="doutor"></div>
+                    <div class="doutor" id="doutor" aria-label="Garçom">
+                        <span class="garcom-sprite" aria-hidden="true"></span>
+                    </div>
                 </div>
                 <button class="interact-btn hidden" id="interact-btn" type="button">Interagir</button>
                 <div class="dica-carrossel" id="dica-carrossel">
@@ -118,9 +121,7 @@ if (!isset($_SESSION["usuario_id"])) {
             <section class="cenario-pedido hidden" id="cenario-pedido">
                 <div class="dialogo" id="dialogo"></div>
                 <div class="cliente-view">
-                    <div class="cliente-head"></div>
-                    <div class="cliente-body"></div>
-                    <div class="mesa-pedido"></div>
+                    <img class="cliente-retrato" id="cliente-retrato" alt="">
                 </div>
                 <div class="caderneta">
                     <div class="caderneta-header">Caderneta</div>

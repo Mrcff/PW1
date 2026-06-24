@@ -23,7 +23,7 @@
     radial-gradient(circle at top right, rgba(251, 162, 86, 0.42), transparent 32%),
     linear-gradient(135deg, #765238, var(--cafe));
   color: var(--texto);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .auth-shell { width: min(100%, 440px); max-height: 100%; }

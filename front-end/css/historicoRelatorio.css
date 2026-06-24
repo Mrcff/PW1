@@ -1,31 +1,314 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
 
-* { box-sizing: border-box; }
-body { margin: 0; min-height: 100vh; background: #f4eadf; color: #35251b; font-family: "Nunito", sans-serif; }
-.relatorio-container { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 76px; }
-.relatorio-topo { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding-bottom: 28px; border-bottom: 2px solid #e2ccb4; }
-.relatorio-etiqueta { margin: 0 0 7px; color: #ab3535; font-size: .78rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
-.relatorio-topo h1 { margin: 0; color: #63452f; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; }
-.relatorio-intro, .legenda-painel { margin: 10px 0 0; color: #735f50; line-height: 1.55; }
-.botao-voltar { display: inline-flex; flex-shrink: 0; padding: 11px 18px; border-radius: 9px; background: #ab3535; color: #fff; font-weight: 800; text-decoration: none; transition: background .15s, transform .15s; }
-.botao-voltar:hover { background: #f44242; transform: translateY(-2px); }
-section { margin-top: 36px; }
-h2 { margin: 0 0 16px; color: #63452f; font-size: 1.15rem; letter-spacing: .06em; text-transform: uppercase; }
-.cards-estatisticas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-.card-estatistica, .painel { border: 1px solid #e2ccb4; border-radius: 14px; background: #fffaf4; box-shadow: 0 5px 14px rgba(99, 69, 47, .09); }
-.card-estatistica { min-height: 128px; padding: 20px; border-top: 5px solid #fba256; }
-.card-estatistica span { display: block; min-height: 38px; color: #765238; font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.card-estatistica strong { display: block; margin-top: 10px; color: #ab3535; font-size: 1.8rem; line-height: 1; }
-.grade-relatorio { display: grid; grid-template-columns: .8fr 1.2fr; gap: 20px; }
-.grade-relatorio section { margin-top: 0; }
-.painel { padding: 26px; }
-.destaque-pontos { margin: 10px 0 24px; color: #ab3535; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; }
-.lista-detalhes { margin: 0; }
-.lista-detalhes div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid #eedfce; }
-.lista-detalhes dt { color: #765238; font-weight: 700; }.lista-detalhes dd { margin: 0; color: #35251b; font-weight: 800; text-align: right; }
-.legenda-painel { margin-top: -8px; font-size: .9rem; }
-.lista-niveis { margin-top: 22px; display: grid; gap: 13px; }.linha-nivel { display: grid; grid-template-columns: 65px 1fr 42px; align-items: center; gap: 12px; color: #63452f; font-size: .88rem; font-weight: 800; }.linha-nivel b { color: #ab3535; text-align: right; }.barra-progresso { height: 10px; overflow: hidden; border-radius: 99px; background: #eedfce; }.barra-progresso i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4874bf, #70a7df); }
-.cabecalho-painel { display: flex; justify-content: space-between; align-items: start; gap: 16px; }.painel-semanal { padding-bottom: 18px; }.grafico-semanal { display: grid; grid-template-columns: repeat(8, 1fr); align-items: end; gap: 12px; height: 230px; margin-top: 26px; }.coluna-semana { display: grid; grid-template-rows: 22px 1fr 24px; height: 100%; gap: 7px; text-align: center; }.valor-semana { color: #765238; font-size: .72rem; font-weight: 800; }.trilho-barra { display: flex; height: 100%; align-items: end; border-radius: 6px 6px 0 0; background: #f3e7d8; }.trilho-barra i { display: block; width: 100%; min-height: 2px; border-radius: 6px 6px 0 0; background: linear-gradient(#fba256, #ab3535); }.rotulo-semana { color: #765238; font-size: .76rem; font-weight: 700; }
-.tabela-responsiva { overflow-x: auto; margin-top: 22px; }table { width: 100%; min-width: 560px; border-collapse: collapse; }th, td { padding: 14px 16px; border-bottom: 1px solid #eedfce; text-align: left; }th { background: #f1e1cf; color: #765238; font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }td { color: #4b382b; font-size: .94rem; }td:last-child { color: #ab3535; font-weight: 900; }tbody tr:last-child td { border-bottom: 0; }tbody tr:hover { background: #fff4e9; }.estado-vazio { margin: 20px 0 0; color: #765238; font-style: italic; }
-@media (max-width: 900px) { .cards-estatisticas { grid-template-columns: repeat(3, 1fr); }.grade-relatorio { grid-template-columns: 1fr; } }
-@media (max-width: 600px) { .relatorio-container { width: min(100% - 28px, 1120px); padding-top: 32px; }.relatorio-topo { align-items: start; flex-direction: column; }.botao-voltar { width: 100%; justify-content: center; }.cards-estatisticas { grid-template-columns: repeat(2, 1fr); }.card-estatistica { min-height: 112px; padding: 16px; }.card-estatistica strong { font-size: 1.5rem; }.painel { padding: 20px 16px; }.grafico-semanal { gap: 5px; height: 200px; }.valor-semana { font-size: .62rem; }.rotulo-semana { font-size: .66rem; }.linha-nivel { grid-template-columns: 58px 1fr 38px; gap: 8px; } }
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f4eadf;
+  color: #35251b;
+  font-family: "Times New Roman", Times, serif;
+}
+.relatorio-container {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0 76px;
+}
+.relatorio-topo {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid #e2ccb4;
+}
+.relatorio-etiqueta {
+  margin: 0 0 7px;
+  color: #ab3535;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.relatorio-topo h1 {
+  margin: 0;
+  color: #63452f;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+}
+.relatorio-intro,
+.legenda-painel {
+  margin: 10px 0 0;
+  color: #735f50;
+  line-height: 1.55;
+}
+.botao-voltar {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 11px 18px;
+  border-radius: 9px;
+  background: #ab3535;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    transform 0.15s;
+}
+.botao-voltar:hover {
+  background: #f44242;
+  transform: translateY(-2px);
+}
+section {
+  margin-top: 36px;
+}
+h2 {
+  margin: 0 0 16px;
+  color: #63452f;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cards-estatisticas {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.card-estatistica,
+.painel {
+  border: 1px solid #e2ccb4;
+  border-radius: 14px;
+  background: #fffaf4;
+  box-shadow: 0 5px 14px rgba(99, 69, 47, 0.09);
+}
+.card-estatistica {
+  min-height: 128px;
+  padding: 20px;
+  border-top: 5px solid #fba256;
+}
+.card-estatistica span {
+  display: block;
+  min-height: 38px;
+  color: #765238;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.card-estatistica strong {
+  display: block;
+  margin-top: 10px;
+  color: #ab3535;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.grade-relatorio {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 20px;
+}
+.grade-relatorio section {
+  margin-top: 0;
+}
+.painel {
+  padding: 26px;
+}
+.destaque-pontos {
+  margin: 10px 0 24px;
+  color: #ab3535;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 900;
+}
+.lista-detalhes {
+  margin: 0;
+}
+.lista-detalhes div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-top: 1px solid #eedfce;
+}
+.lista-detalhes dt {
+  color: #765238;
+  font-weight: 700;
+}
+.lista-detalhes dd {
+  margin: 0;
+  color: #35251b;
+  font-weight: 800;
+  text-align: right;
+}
+.legenda-painel {
+  margin-top: -8px;
+  font-size: 0.9rem;
+}
+.lista-niveis {
+  margin-top: 22px;
+  display: grid;
+  gap: 13px;
+}
+.linha-nivel {
+  display: grid;
+  grid-template-columns: 65px 1fr 42px;
+  align-items: center;
+  gap: 12px;
+  color: #63452f;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.linha-nivel b {
+  color: #ab3535;
+  text-align: right;
+}
+.barra-progresso {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #eedfce;
+}
+.barra-progresso i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4874bf, #70a7df);
+}
+.cabecalho-painel {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+.painel-semanal {
+  padding-bottom: 18px;
+}
+.grafico-semanal {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  align-items: end;
+  gap: 12px;
+  height: 230px;
+  margin-top: 26px;
+}
+.coluna-semana {
+  display: grid;
+  grid-template-rows: 22px 1fr 24px;
+  height: 100%;
+  gap: 7px;
+  text-align: center;
+}
+.valor-semana {
+  color: #765238;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.trilho-barra {
+  display: flex;
+  height: 100%;
+  align-items: end;
+  border-radius: 6px 6px 0 0;
+  background: #f3e7d8;
+}
+.trilho-barra i {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(#fba256, #ab3535);
+}
+.rotulo-semana {
+  color: #765238;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.tabela-responsiva {
+  overflow-x: auto;
+  margin-top: 22px;
+}
+table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eedfce;
+  text-align: left;
+}
+th {
+  background: #f1e1cf;
+  color: #765238;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+td {
+  color: #4b382b;
+  font-size: 0.94rem;
+}
+td:last-child {
+  color: #ab3535;
+  font-weight: 900;
+}
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+tbody tr:hover {
+  background: #fff4e9;
+}
+.estado-vazio {
+  margin: 20px 0 0;
+  color: #765238;
+  font-style: italic;
+}
+@media (max-width: 900px) {
+  .cards-estatisticas {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grade-relatorio {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .relatorio-container {
+    width: min(100% - 28px, 1120px);
+    padding-top: 32px;
+  }
+  .relatorio-topo {
+    align-items: start;
+    flex-direction: column;
+  }
+  .botao-voltar {
+    width: 100%;
+    justify-content: center;
+  }
+  .cards-estatisticas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card-estatistica {
+    min-height: 112px;
+    padding: 16px;
+  }
+  .card-estatistica strong {
+    font-size: 1.5rem;
+  }
+  .painel {
+    padding: 20px 16px;
+  }
+  .grafico-semanal {
+    gap: 5px;
+    height: 200px;
+  }
+  .valor-semana {
+    font-size: 0.62rem;
+  }
+  .rotulo-semana {
+    font-size: 0.66rem;
+  }
+  .linha-nivel {
+    grid-template-columns: 58px 1fr 38px;
+    gap: 8px;
+  }
+}

@@ -25,6 +25,10 @@ const jogoEstado = {
     x: 84,
     y: 275,
     speed: 4,
+    direcao: "front",
+    frame: 0,
+    andando: false,
+    ultimoFrameAnimacao: 0,
   },
   keys: new Set(),
   mesas: [],
@@ -46,9 +50,11 @@ const cenarioPedido = document.getElementById("cenario-pedido");
 const chao = document.getElementById("chao-restaurante");
 const mesaLayer = document.getElementById("mesa-layer");
 const garcom = document.getElementById("doutor");
+const garcomSprite = garcom.querySelector(".garcom-sprite");
 const interactBtn = document.getElementById("interact-btn");
 const cozinha = document.getElementById("cozinha");
 const dialogoBox = document.getElementById("dialogo");
+const clienteRetrato = document.getElementById("cliente-retrato");
 const pedidoInput = document.getElementById("pedido-input");
 const pedidoAnotado = document.getElementById("pedido-anotado");
 const feedbackAnotacao = document.getElementById("feedback-anotacao");
@@ -71,6 +77,27 @@ const btnTentarNovamente = document.getElementById("btn-tentar-novamente");
 const cenarioPais = document.getElementById("cenario-pais");
 const arvoresCenario = document.querySelectorAll(".arvore-cenario");
 const CHAVE_PARTIDA_ATUAL = "pw1.partidaAtual";
+const INTERVALO_FRAME_GARCOM_MS = 125;
+const FRAMES_GARCOM = {
+  left: [
+    { coluna: 0, linha: 1 },
+    { coluna: 0, linha: 0 },
+  ],
+  right: [
+    { coluna: 2, linha: 1 },
+    { coluna: 2, linha: 0 },
+  ],
+  front: [
+    { coluna: 1, linha: 1 },
+    { coluna: 1, linha: 2 },
+    { coluna: 2, linha: 2 },
+    { coluna: 1, linha: 2 },
+  ],
+  back: [
+    { coluna: 1, linha: 0 },
+    { coluna: 0, linha: 2 },
+  ],
+};
 
 //================
 // FUNÇÕES
@@ -95,6 +122,23 @@ function pegarRandom(items) {
 //f:pegarCenariosJogo
 function pegarCenariosJogo() {
   return Array.isArray(window.CenariosJogo) ? window.CenariosJogo : [];
+}
+
+//f:pegarPersonagensJogo
+function pegarPersonagensJogo() {
+  return window.PersonagensJogo && typeof window.PersonagensJogo === "object"
+    ? window.PersonagensJogo
+    : {};
+}
+
+//f:sortearPersonagem
+function sortearPersonagem() {
+  const personagens = pegarPersonagensJogo();
+  const ids = Object.keys(personagens);
+  if (!ids.length) return null;
+
+  const id = pegarRandom(ids);
+  return { id, ...personagens[id] };
 }
 
 //f:sortearCenario
@@ -286,6 +330,7 @@ function criarLevel(level, sortearNovoCenario = false) {
   });
 
   posicaoMesas();
+  posicionarGarcomNoBalcao();
   atualizarHUD();
   cozinha.classList.remove("entregue");
 
@@ -392,6 +437,7 @@ function spawnCliente(mesa, params) {
   mesa.estrelasCliente = 3;
   mesa.pacienciaCicloMs =
     tipo === "normal" ? p.pacienciaNormalMs : p.pacienciaRudeMs;
+  mesa.personagem = sortearPersonagem();
 
   const clienteEl = mesa.element.querySelector(".cliente");
   const barEl = mesa.element.querySelector(".paciencia-bar");
@@ -400,6 +446,9 @@ function spawnCliente(mesa, params) {
   clienteEl.classList.remove("hidden");
   clienteEl.classList.remove("saindo");
   clienteEl.classList.toggle("rude", tipo === "rude");
+  clienteEl.style.backgroundImage = mesa.personagem
+    ? `url("${mesa.personagem.sprite}")`
+    : "";
   barEl.classList.remove("hidden");
 
   mesa.pacienciaInicio = Date.now();
@@ -648,6 +697,144 @@ function atualizarPosicaoGarcom() {
   garcom.style.transform = `translate(${jogoEstado.garcom.x}px, ${jogoEstado.garcom.y}px)`;
 }
 
+//f:configurarSpriteGarcom
+function configurarSpriteGarcom() {
+  const sprite = window.AtendenteJogo?.sprite;
+  if (sprite) garcomSprite.style.backgroundImage = `url("${sprite}")`;
+  renderizarSpriteGarcom();
+}
+
+//f:renderizarSpriteGarcom
+function renderizarSpriteGarcom() {
+  const frames =
+    FRAMES_GARCOM[jogoEstado.garcom.direcao] ?? FRAMES_GARCOM.front;
+  const frame = frames[jogoEstado.garcom.frame] ?? frames[0];
+
+  garcomSprite.style.backgroundPosition = `${frame.coluna * 50}% ${frame.linha * 50}%`;
+  garcomSprite.classList.remove(
+    "garcom-sprite-espelhado",
+  );
+}
+
+//f:atualizarAnimacaoGarcom
+function atualizarAnimacaoGarcom(tempoAtual, deltaX, deltaY) {
+  const estaAndando = deltaX !== 0 || deltaY !== 0;
+
+  if (estaAndando) {
+    const direcaoAnterior = jogoEstado.garcom.direcao;
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      jogoEstado.garcom.direcao = deltaX > 0 ? "right" : "left";
+    } else {
+      jogoEstado.garcom.direcao = deltaY > 0 ? "front" : "back";
+    }
+
+    if (!jogoEstado.garcom.andando || direcaoAnterior !== jogoEstado.garcom.direcao) {
+      jogoEstado.garcom.frame = 0;
+      jogoEstado.garcom.ultimoFrameAnimacao = tempoAtual;
+    } else if (
+      tempoAtual - jogoEstado.garcom.ultimoFrameAnimacao >=
+      INTERVALO_FRAME_GARCOM_MS
+    ) {
+      const frames = FRAMES_GARCOM[jogoEstado.garcom.direcao];
+      jogoEstado.garcom.frame = (jogoEstado.garcom.frame + 1) % frames.length;
+      jogoEstado.garcom.ultimoFrameAnimacao = tempoAtual;
+    }
+  } else {
+    jogoEstado.garcom.frame = 0;
+  }
+
+  jogoEstado.garcom.andando = estaAndando;
+  renderizarSpriteGarcom();
+}
+
+//f:retangulosSeSobrepoem
+function retangulosSeSobrepoem(a, b) {
+  return (
+    a.x < b.x + b.largura &&
+    a.x + a.largura > b.x &&
+    a.y < b.y + b.altura &&
+    a.y + a.altura > b.y
+  );
+}
+
+//f:pegarRetanguloGarcom
+function pegarRetanguloGarcom(x, y) {
+  const gr = garcom.getBoundingClientRect();
+  const margemHorizontal = 8;
+  const margemVertical = 6;
+
+  return {
+    x: x + margemHorizontal,
+    y: y + margemVertical,
+    largura: Math.max(1, gr.width - margemHorizontal * 2),
+    altura: Math.max(1, gr.height - margemVertical * 2),
+  };
+}
+
+//f:pegarObstaculosSalao
+function pegarObstaculosSalao() {
+  const recuoMesa = 12;
+
+  const mesas = jogoEstado.mesas.map((mesa) => ({
+    x: mesa.x + recuoMesa,
+    y: mesa.y + recuoMesa,
+    largura: Math.max(1, mesa.element.offsetWidth - recuoMesa * 2),
+    altura: Math.max(1, mesa.element.offsetHeight - recuoMesa * 2),
+  }));
+
+  return mesas;
+}
+
+//f:posicionarGarcomNoBalcao
+function posicionarGarcomNoBalcao() {
+  const chaoRect = chao.getBoundingClientRect();
+  const cozinhaRect = cozinha.getBoundingClientRect();
+  const garcomRect = garcom.getBoundingClientRect();
+  const maxX = chaoRect.width - garcomRect.width;
+  const maxY = chaoRect.height - garcomRect.height;
+
+  jogoEstado.garcom.x = garimpar(
+    cozinhaRect.left - chaoRect.left + (cozinhaRect.width - garcomRect.width) / 2,
+    0,
+    maxX,
+  );
+  jogoEstado.garcom.y = garimpar(
+    cozinhaRect.top - chaoRect.top + (cozinhaRect.height - garcomRect.height) / 2,
+    0,
+    maxY,
+  );
+  atualizarPosicaoGarcom();
+}
+
+//f:podeMoverGarcomPara
+function podeMoverGarcomPara(x, y) {
+  const chaoRect = chao.getBoundingClientRect();
+  const garcomRect = garcom.getBoundingClientRect();
+  const posicaoLimitadaX = garimpar(x, 0, chaoRect.width - garcomRect.width);
+  const posicaoLimitadaY = garimpar(y, 0, chaoRect.height - garcomRect.height);
+  const retanguloGarcom = pegarRetanguloGarcom(
+    posicaoLimitadaX,
+    posicaoLimitadaY,
+  );
+
+  return !pegarObstaculosSalao().some((obstaculo) =>
+    retangulosSeSobrepoem(retanguloGarcom, obstaculo),
+  );
+}
+
+//f:moverGarcom
+function moverGarcom(deltaX, deltaY) {
+  const alvoX = jogoEstado.garcom.x + deltaX;
+  if (deltaX && podeMoverGarcomPara(alvoX, jogoEstado.garcom.y)) {
+    jogoEstado.garcom.x = alvoX;
+  }
+
+  const alvoY = jogoEstado.garcom.y + deltaY;
+  if (deltaY && podeMoverGarcomPara(jogoEstado.garcom.x, alvoY)) {
+    jogoEstado.garcom.y = alvoY;
+  }
+}
+
 //f:recalcularPosicaoGarcomAposResize
 function recalcularPosicaoGarcomAposResize() {
   const r = chao.getBoundingClientRect();
@@ -714,16 +901,25 @@ function atualizarBotao() {
 
 //cod2319
 //f:controlesJogo
-function controlesJogo() {
+function controlesJogo(tempoAtual) {
   if (jogoEstado.modo === "salao") {
-    if (jogoEstado.keys.has("arrowup") || jogoEstado.keys.has("w"))
-      jogoEstado.garcom.y -= jogoEstado.garcom.speed;
-    if (jogoEstado.keys.has("arrowdown") || jogoEstado.keys.has("s"))
-      jogoEstado.garcom.y += jogoEstado.garcom.speed;
-    if (jogoEstado.keys.has("arrowleft") || jogoEstado.keys.has("a"))
-      jogoEstado.garcom.x -= jogoEstado.garcom.speed;
-    if (jogoEstado.keys.has("arrowright") || jogoEstado.keys.has("d"))
-      jogoEstado.garcom.x += jogoEstado.garcom.speed;
+    const deltaX =
+      (jogoEstado.keys.has("arrowright") || jogoEstado.keys.has("d")
+        ? jogoEstado.garcom.speed
+        : 0) -
+      (jogoEstado.keys.has("arrowleft") || jogoEstado.keys.has("a")
+        ? jogoEstado.garcom.speed
+        : 0);
+    const deltaY =
+      (jogoEstado.keys.has("arrowdown") || jogoEstado.keys.has("s")
+        ? jogoEstado.garcom.speed
+        : 0) -
+      (jogoEstado.keys.has("arrowup") || jogoEstado.keys.has("w")
+        ? jogoEstado.garcom.speed
+        : 0);
+
+    moverGarcom(deltaX, deltaY);
+    atualizarAnimacaoGarcom(tempoAtual, deltaX, deltaY);
     atualizarPosicaoGarcom();
     atualizarBotao();
   }
@@ -771,6 +967,14 @@ function iniciarPedido(mesa) {
   jogoEstado.mesaAtualCancelavel = mesa;
   jogoEstado.pedidoAtual = pegarRandom(pegarObjetosJogo().pedidos[0].opcoes);
   mesa.pedidoRecebido = true;
+
+  if (mesa.personagem) {
+    clienteRetrato.src = mesa.personagem.retrato;
+    clienteRetrato.alt = `Retrato de ${mesa.personagem.nome}`;
+  } else {
+    clienteRetrato.removeAttribute("src");
+    clienteRetrato.alt = "";
+  }
 
   if (mesa.pacienciaTimer) {
     window.clearInterval(mesa.pacienciaTimer);
@@ -1181,6 +1385,7 @@ function iniciarCarrosselDicas() {
 }
 
 window.addEventListener("load", () => {
+  configurarSpriteGarcom();
   bloquearCola();
   if (restaurarPartidaLocal()) {
     iniciarLoop();

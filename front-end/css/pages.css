@@ -186,7 +186,7 @@ h3 {
     radial-gradient(circle at 78% 18%, rgba(251, 162, 86, .38), transparent 24%),
     linear-gradient(145deg, #765238, #c0a484);
   color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .home-page .site-header {
