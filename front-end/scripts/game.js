@@ -35,7 +35,7 @@ const jogoEstado = {
   dialogoTimers: [],
   spawnAgendados: [],
   spawnInterval: null,
-  loopRodando: false
+  loopRodando: false,
 };
 
 //====================
@@ -202,9 +202,9 @@ function restaurarPartidaLocal() {
     jogoEstado.scoreInicioLevel = Number(partida.scoreInicioLevel) || 0;
     jogoEstado.estrelasRestaurante = Number(partida.estrelasRestaurante) || 5;
     jogoEstado.ultimoCenarioId = partida.ultimoCenarioId ?? null;
-    jogoEstado.cenarioAtual = pegarCenariosJogo().find(
-      (cenario) => cenario.id === partida.cenarioId,
-    ) ?? null;
+    jogoEstado.cenarioAtual =
+      pegarCenariosJogo().find((cenario) => cenario.id === partida.cenarioId) ??
+      null;
     jogoEstado.modo = "salao";
 
     telaInicio.classList.add("hidden");
@@ -375,8 +375,8 @@ function tentarSpawnProximo() {
   spawnCliente(mesaLivre, params);
 
   if (jogoEstado.clientesNaFila > 0) {
-        agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
-    }
+    agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
+  }
 }
 
 //f:limparTimersLevel
@@ -394,39 +394,43 @@ function limparTimersLevel() {
 //cod2319
 //f:agendarSpawn
 function agendarSpawn(fn, delayMs) {
-    const entrada = { timerId: null, disparoEm: Date.now() + delayMs, fn };
-    entrada.timerId = window.setTimeout(() => {
-        jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((s) => s !== entrada);
-        fn();
-    }, delayMs);
-    jogoEstado.spawnAgendados.push(entrada);
+  const entrada = { timerId: null, disparoEm: Date.now() + delayMs, fn };
+  entrada.timerId = window.setTimeout(() => {
+    jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter(
+      (s) => s !== entrada,
+    );
+    fn();
+  }, delayMs);
+  jogoEstado.spawnAgendados.push(entrada);
 }
 
 //cod2319
 //f:pausarSpawns
 function pausarSpawns() {
-    const agora = Date.now();
-    jogoEstado.spawnAgendados.forEach((s) => {
-        window.clearTimeout(s.timerId);
-        s.timerId = null;
-        s.restanteMs = Math.max(0, s.disparoEm - agora);
-    });
+  const agora = Date.now();
+  jogoEstado.spawnAgendados.forEach((s) => {
+    window.clearTimeout(s.timerId);
+    s.timerId = null;
+    s.restanteMs = Math.max(0, s.disparoEm - agora);
+  });
 }
 
 //cod2319
 //f:retornarSpawns
 function retornarSpawns() {
-    const pendentes = [...jogoEstado.spawnAgendados];
-    jogoEstado.spawnAgendados = [];
-    pendentes.forEach((s) => {
-        const delay = s.restanteMs ?? 0;
-        const entrada = { timerId: null, disparoEm: Date.now() + delay, fn: s.fn };
-        entrada.timerId = window.setTimeout(() => {
-            jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((x) => x !== entrada);
-            entrada.fn();
-        }, delay);
-        jogoEstado.spawnAgendados.push(entrada);
-    });
+  const pendentes = [...jogoEstado.spawnAgendados];
+  jogoEstado.spawnAgendados = [];
+  pendentes.forEach((s) => {
+    const delay = s.restanteMs ?? 0;
+    const entrada = { timerId: null, disparoEm: Date.now() + delay, fn: s.fn };
+    entrada.timerId = window.setTimeout(() => {
+      jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter(
+        (x) => x !== entrada,
+      );
+      entrada.fn();
+    }, delay);
+    jogoEstado.spawnAgendados.push(entrada);
+  });
 }
 
 //f:spawnCliente
@@ -552,13 +556,15 @@ function finalizarLevel() {
 
   entreLevelModal.classList.remove("hidden");
 
-  //envia pontuação para api
-  salvarPontuacao(pontuacaoLevel, jogoEstado.level);
   limparPartidaLocal();
 }
 
 //f:irProximaFase
 function irProximaFase() {
+  // A conclusao so vale para a liga quando o jogador confirma o avanco.
+  const pontuacaoLevel = jogoEstado.score - jogoEstado.scoreInicioLevel;
+  if (pontuacaoLevel > 0) salvarPontuacao(pontuacaoLevel, jogoEstado.level);
+
   entreLevelModal.classList.add("hidden");
   jogoEstado.level += 1;
   jogoEstado.scoreInicioLevel = jogoEstado.score;
@@ -613,8 +619,9 @@ function criarMesasFisicas(quant) {
   }
 
   function posicaoDisponivel(x, y) {
-    return !sobrepoe(x, y, areaCozinha) && !posicoes.some((posicao) =>
-      sobrepoe(x, y, posicao),
+    return (
+      !sobrepoe(x, y, areaCozinha) &&
+      !posicoes.some((posicao) => sobrepoe(x, y, posicao))
     );
   }
 
@@ -711,9 +718,7 @@ function renderizarSpriteGarcom() {
   const frame = frames[jogoEstado.garcom.frame] ?? frames[0];
 
   garcomSprite.style.backgroundPosition = `${frame.coluna * 50}% ${frame.linha * 50}%`;
-  garcomSprite.classList.remove(
-    "garcom-sprite-espelhado",
-  );
+  garcomSprite.classList.remove("garcom-sprite-espelhado");
 }
 
 //f:atualizarAnimacaoGarcom
@@ -728,7 +733,10 @@ function atualizarAnimacaoGarcom(tempoAtual, deltaX, deltaY) {
       jogoEstado.garcom.direcao = deltaY > 0 ? "front" : "back";
     }
 
-    if (!jogoEstado.garcom.andando || direcaoAnterior !== jogoEstado.garcom.direcao) {
+    if (
+      !jogoEstado.garcom.andando ||
+      direcaoAnterior !== jogoEstado.garcom.direcao
+    ) {
       jogoEstado.garcom.frame = 0;
       jogoEstado.garcom.ultimoFrameAnimacao = tempoAtual;
     } else if (
@@ -794,12 +802,16 @@ function posicionarGarcomNoBalcao() {
   const maxY = chaoRect.height - garcomRect.height;
 
   jogoEstado.garcom.x = garimpar(
-    cozinhaRect.left - chaoRect.left + (cozinhaRect.width - garcomRect.width) / 2,
+    cozinhaRect.left -
+      chaoRect.left +
+      (cozinhaRect.width - garcomRect.width) / 2,
     0,
     maxX,
   );
   jogoEstado.garcom.y = garimpar(
-    cozinhaRect.top - chaoRect.top + (cozinhaRect.height - garcomRect.height) / 2,
+    cozinhaRect.top -
+      chaoRect.top +
+      (cozinhaRect.height - garcomRect.height) / 2,
     0,
     maxY,
   );
@@ -929,9 +941,9 @@ function controlesJogo(tempoAtual) {
 //cod2319
 //f:iniciarLoop
 function iniciarLoop() {
-    if (jogoEstado.loopRodando) return;
-    jogoEstado.loopRodando = true;
-    requestAnimationFrame(controlesJogo);
+  if (jogoEstado.loopRodando) return;
+  jogoEstado.loopRodando = true;
+  requestAnimationFrame(controlesJogo);
 }
 
 //f:renderizarDialogo
@@ -1059,21 +1071,21 @@ function cancelarPedido() {
 //cod2319
 //f:finalizarPedido
 function finalizarPedido() {
-    jogoEstado.modo = "salao";
-    jogoEstado.segurandoPedido = true;
-    jogoEstado.score += 100;
-    jogoEstado.mesaAtualCancelavel = null;
-    cenarioPedido.classList.add("hidden");
-    cenarioSala.classList.remove("hidden");
-    feedbackAnotacao.textContent = "Pedido anotado.";
-    retornarBarras();
-    if (jogoEstado.resizePendente) {
-        jogoEstado.resizePendente = false;
-        posicaoMesas();
-        recalcularPosicaoGarcomAposResize();
-    }
-    atualizarHUD();
-    atualizarBotao();
+  jogoEstado.modo = "salao";
+  jogoEstado.segurandoPedido = true;
+  jogoEstado.score += 100;
+  jogoEstado.mesaAtualCancelavel = null;
+  cenarioPedido.classList.add("hidden");
+  cenarioSala.classList.remove("hidden");
+  feedbackAnotacao.textContent = "Pedido anotado.";
+  retornarBarras();
+  if (jogoEstado.resizePendente) {
+    jogoEstado.resizePendente = false;
+    posicaoMesas();
+    recalcularPosicaoGarcomAposResize();
+  }
+  atualizarHUD();
+  atualizarBotao();
 }
 
 //f:entregarPedido
@@ -1319,7 +1331,6 @@ window.addEventListener("resize", () => {
 
 window.addEventListener("pagehide", salvarPartidaLocal);
 
-
 //cod2319
 window.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
@@ -1335,7 +1346,10 @@ window.addEventListener("keydown", (event) => {
     if (jogoEstado.modo === "pedindo") return;
     const modoAtivo = ["salao", "pausado", "entre-levels", "gameover"];
     if (modoAtivo.includes(jogoEstado.modo)) event.preventDefault();
-    if (jogoEstado.modo === "salao" && !interactBtn.classList.contains("hidden")) {
+    if (
+      jogoEstado.modo === "salao" &&
+      !interactBtn.classList.contains("hidden")
+    ) {
       interactBtn.click();
     }
     return;

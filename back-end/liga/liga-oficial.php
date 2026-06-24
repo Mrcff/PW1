@@ -1,6 +1,6 @@
 <?php
 
-const LIGA_OFICIAL_NOME = "Liga Oficial do Jogo";
+const LIGA_OFICIAL_NOME = "Liga Geral do Jogo";
 const LIGA_OFICIAL_CHAVE = "__liga_oficial_pw1__";
 
 function garantirLigaOficial($conexao) {

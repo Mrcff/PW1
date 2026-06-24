@@ -1,21 +1,25 @@
 <?php
+// Inicia a sessao para identificar o jogador logado.
 session_start();
 
+// A pagina de ligas exige autenticacao.
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: ../../back-end/login/login.php");
     exit;
 }
 
+// Carrega a conexao com o banco e as funcoes da Liga Oficial.
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
 require_once __DIR__ . "/../../back-end/liga/liga-oficial.php";
 
+// Garante que o usuario atual exista na Liga Oficial.
 $usuario_id = $_SESSION["usuario_id"];
 $ligaJogoId = garantirLigaOficial($conexao);
 incluirUsuarioNaLigaOficial($conexao, $ligaJogoId, $usuario_id);
 $mensagem   = "";
 $erro       = "";
 
-// criar liga
+// Cria uma liga e adiciona automaticamente o criador como primeiro membro.
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "criar") {
 
     $nome         = trim($_POST["nome"] ?? "");
@@ -24,7 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
 
     if (empty($nome) || empty($palavraChave)) {
         $erro = "Nome e palavra-chave são obrigatórios.";
+    } elseif (!empty($dataFim) && $dataFim < date("Y-m-d")) {
+        // Evita criar uma liga que ja nasceria encerrada.
+        $erro = "A data de encerramento nao pode estar no passado.";
     } else {
+        // Salva a liga. Data vazia vira NULL, ou seja, sem encerramento.
         $stmt = mysqli_prepare($conexao,
             "INSERT INTO liga (nome, palavraChave, criador_id, dataFim) VALUES (?, ?, ?, ?)"
         );
@@ -38,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
                 $erro = "Erro ao criar liga.";
             }
         } else {
+            // Registra a entrada do criador; dataEntrada sera usada no ranking.
             $liga_id = mysqli_insert_id($conexao);
             $stmt2 = mysqli_prepare($conexao,
                 "INSERT INTO ligaUsuario (liga_id, usuario_id) VALUES (?, ?)"
@@ -51,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     }
 }
 
-// entrar na liga
+// Adiciona o usuario a uma liga existente usando a palavra-chave.
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "entrar") {
 
     $palavraChave = trim($_POST["palavraChave"] ?? "");
@@ -59,7 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     if (empty($palavraChave)) {
         $erro = "Informe a palavra-chave da liga.";
     } else {
-        $stmt = mysqli_prepare($conexao, "SELECT id, nome FROM liga WHERE palavraChave = ?");
+        // Localiza a liga e sua data de encerramento pela palavra-chave.
+        $stmt = mysqli_prepare($conexao, "SELECT id, nome, dataFim FROM liga WHERE palavraChave = ?");
         mysqli_stmt_bind_param($stmt, "s", $palavraChave);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -68,7 +78,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
 
         if (!$liga) {
             $erro = "Palavra-chave inválida.";
+        } elseif ($liga["dataFim"] !== null && $liga["dataFim"] < date("Y-m-d")) {
+            $erro = "Esta liga foi encerrada.";
         } else {
+            // Evita inserir o mesmo usuario duas vezes na mesma liga.
             $stmtCheck = mysqli_prepare($conexao,
                 "SELECT 1 FROM ligaUsuario WHERE liga_id = ? AND usuario_id = ?"
             );
@@ -79,6 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
             if (mysqli_num_rows($resultCheck) > 0) {
                 $erro = "Você já participa dessa liga.";
             } else {
+                // A dataEntrada recebe o horario atual pelo valor padrao da tabela.
                 $stmt2 = mysqli_prepare($conexao,
                     "INSERT INTO ligaUsuario (liga_id, usuario_id) VALUES (?, ?)"
                 );
@@ -92,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     }
 }
 
-// busca ligas do usuário
+// Busca as ligas do usuario; a Oficial fica no topo da lista.
 $stmtLigas = mysqli_prepare($conexao,
     "SELECT l.id, l.nome, l.dataCriacao, l.dataFim
      FROM liga l
@@ -110,6 +124,7 @@ while ($l = mysqli_fetch_assoc($resultLigas)) {
 mysqli_stmt_close($stmtLigas);
 
 // reabre modal se houve erro ao criar
+// Mantem o modal de criacao aberto para exibir erros de validacao.
 $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
     && isset($_POST["acao"])
     && $_POST["acao"] === "criar"
@@ -207,38 +222,45 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
             <p class="liga-info">Encerra em: <?= $liga["dataFim"] ?></p>
         <?php endif; ?>
 
+        <?php // A Oficial usa ranking global; as criadas respeitam a entrada do membro. ?>
         <?php $ehLigaDoJogo = (int) $liga["id"] === $ligaJogoId; ?>
         <!-- Ranking geral -->
         <?php
         if ($ehLigaDoJogo) {
+            // Liga Oficial: melhor pontuacao entre todos os jogadores.
             $stmtRank = mysqli_prepare($conexao,
-                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM usuarios u
                  LEFT JOIN partida p ON p.usuario_id = u.id
                  GROUP BY u.id, u.nome
                  ORDER BY total DESC"
             );
         } else {
+            // Liga criada: melhor pontuacao somente dentro do periodo valido do membro.
             $stmtRank = mysqli_prepare($conexao,
-                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM ligaUsuario lu
+                 INNER JOIN liga l ON l.id = lu.liga_id
                  INNER JOIN usuarios u ON u.id = lu.usuario_id
                  LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
-                     AND p.dataPartida >= ?
+                     -- Resultados anteriores a entrada ou posteriores ao fim nao contam.
+                     AND p.dataPartida >= lu.dataEntrada
+                     AND (l.dataFim IS NULL OR p.dataPartida < DATE_ADD(l.dataFim, INTERVAL 1 DAY))
                  WHERE lu.liga_id = ?
                  GROUP BY u.id, u.nome
                  ORDER BY total DESC"
             );
-            mysqli_stmt_bind_param($stmtRank, "si", $liga["dataCriacao"], $liga["id"]);
+            mysqli_stmt_bind_param($stmtRank, "i", $liga["id"]);
         }
         mysqli_stmt_execute($stmtRank);
         $resRank = mysqli_stmt_get_result($stmtRank);
         ?>
 
+        <!-- Cada jogador aparece pela sua melhor partida, sem somar tentativas. -->
         <p class="ranking-titulo">Ranking geral</p>
         <table>
             <thead>
-                <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
+                <tr><th>#</th><th>Jogador</th><th>Melhor pontuacao</th></tr>
             </thead>
             <tbody>
                 <?php $pos = 1; while ($row = mysqli_fetch_assoc($resRank)): ?>
@@ -255,8 +277,9 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
         <!-- Ranking semanal -->
         <?php
         if ($ehLigaDoJogo) {
+            // Liga Oficial: melhor resultado obtido nos ultimos sete dias.
             $stmtSem = mysqli_prepare($conexao,
-                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM usuarios u
                  LEFT JOIN partida p ON p.usuario_id = u.id
                      AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
@@ -264,12 +287,17 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
                  ORDER BY total DESC"
             );
         } else {
+            // Liga criada: aplica semana, entrada do membro e encerramento da liga.
             $stmtSem = mysqli_prepare($conexao,
-                "SELECT u.nome, COALESCE(SUM(p.pontuacao), 0) AS total
+                "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM ligaUsuario lu
+                 INNER JOIN liga l ON l.id = lu.liga_id
                  INNER JOIN usuarios u ON u.id = lu.usuario_id
                  LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
                      AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                     -- A semana tambem respeita a entrada do jogador e o fim da liga.
+                     AND p.dataPartida >= lu.dataEntrada
+                     AND (l.dataFim IS NULL OR p.dataPartida < DATE_ADD(l.dataFim, INTERVAL 1 DAY))
                  WHERE lu.liga_id = ?
                  GROUP BY u.id, u.nome
                  ORDER BY total DESC"
@@ -280,10 +308,11 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
         $resSem = mysqli_stmt_get_result($stmtSem);
         ?>
 
+        <!-- No ranking semanal, a melhor partida e limitada aos ultimos sete dias. -->
         <p class="ranking-titulo">Ranking semanal</p>
         <table>
             <thead>
-                <tr><th>#</th><th>Jogador</th><th>Pontos</th></tr>
+                <tr><th>#</th><th>Jogador</th><th>Melhor pontuacao</th></tr>
             </thead>
             <tbody>
                 <?php $pos = 1; while ($row = mysqli_fetch_assoc($resSem)): ?>
