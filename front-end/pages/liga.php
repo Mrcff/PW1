@@ -13,8 +13,9 @@ require_once __DIR__ . "/../../back-end/liga/liga-oficial.php";
 $usuario_id = $_SESSION["usuario_id"];
 $ligaJogoId = garantirLigaOficial($conexao);
 incluirUsuarioNaLigaOficial($conexao, $ligaJogoId, $usuario_id);
-$mensagem   = "";
-$erro       = "";
+$mensagem   = $_SESSION["mensagem_liga"] ?? "";
+$erro       = $_SESSION["erro_liga"] ?? "";
+unset($_SESSION["mensagem_liga"], $_SESSION["erro_liga"]);
 
 // Cria uma liga e adiciona automaticamente o criador como primeiro membro.
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "criar") {
@@ -23,25 +24,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
     $palavraChave = trim($_POST["palavraChave"] ?? "");
     $dataFim      = trim($_POST["dataFim"] ?? "");
 
-    if (empty($nome) || empty($palavraChave)) {
-        $erro = "Nome e palavra-chave são obrigatórios.";
-    } elseif (!empty($dataFim) && $dataFim < date("Y-m-d")) {
+    if (empty($nome) || empty($palavraChave) || empty($dataFim)) {
+        $erro = "Nome, palavra-chave e data de encerramento sao obrigatorios.";
+    } elseif ($dataFim < date("Y-m-d")) {
         // Evita criar uma liga que ja nasceria encerrada.
         $erro = "A data de encerramento nao pode estar no passado.";
     } else {
-        // Salva a liga. Data vazia vira NULL, ou seja, sem encerramento.
+        // Evita erro por nome ou palavra-chave repetidos.
+        $stmtCheckLiga = mysqli_prepare($conexao,
+            "SELECT 1 FROM liga WHERE nome = ? OR palavraChave = ? LIMIT 1"
+        );
+        mysqli_stmt_bind_param($stmtCheckLiga, "ss", $nome, $palavraChave);
+        mysqli_stmt_execute($stmtCheckLiga);
+        $resultCheckLiga = mysqli_stmt_get_result($stmtCheckLiga);
+
+        if (mysqli_num_rows($resultCheckLiga) > 0) {
+            $erro = "Ja existe uma liga com esse nome ou palavra-chave.";
+        }
+        mysqli_stmt_close($stmtCheckLiga);
+
+        if (empty($erro)) {
+        // Salva a liga criada.
         $stmt = mysqli_prepare($conexao,
             "INSERT INTO liga (nome, palavraChave, criador_id, dataFim) VALUES (?, ?, ?, ?)"
         );
-        $dataFimFinal = empty($dataFim) ? null : $dataFim;
-        mysqli_stmt_bind_param($stmt, "ssis", $nome, $palavraChave, $usuario_id, $dataFimFinal);
+        mysqli_stmt_bind_param($stmt, "ssis", $nome, $palavraChave, $usuario_id, $dataFim);
 
         if (!mysqli_stmt_execute($stmt)) {
-            if (mysqli_errno($conexao) === 1062) {
-                $erro = "Já existe uma liga com esse nome ou palavra-chave.";
-            } else {
-                $erro = "Erro ao criar liga.";
-            }
+          $erro = "Erro ao criar liga.";
         } else {
             // Registra a entrada do criador; dataEntrada sera usada no ranking.
             $liga_id = mysqli_insert_id($conexao);
@@ -54,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
             $mensagem = "Liga criada com sucesso!";
         }
         mysqli_stmt_close($stmt);
+        }
     }
 }
 
@@ -95,12 +106,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["ac
                 );
                 mysqli_stmt_bind_param($stmt2, "ii", $liga["id"], $usuario_id);
                 mysqli_stmt_execute($stmt2);
-                $mensagem = "Você entrou na liga " . htmlspecialchars($liga["nome"]) . "!";
+                $mensagem = "Você entrou na liga: " . htmlspecialchars($liga["nome"]) . "!";
                 mysqli_stmt_close($stmt2);
             }
             mysqli_stmt_close($stmtCheck);
         }
     }
+}
+
+// Evita o alerta do navegador ao recarregar apos envio de formulario.
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (!empty($erro)) {
+        $_SESSION["erro_liga"] = $erro;
+    }
+    if (!empty($mensagem)) {
+        $_SESSION["mensagem_liga"] = $mensagem;
+    }
+    header("Location: liga.php");
+    exit;
 }
 
 // Busca as ligas do usuario; a Oficial fica no topo da lista.
@@ -120,12 +143,8 @@ while ($l = mysqli_fetch_assoc($resultLigas)) {
 }
 mysqli_stmt_close($stmtLigas);
 
-// reabre modal se houve erro ao criar
-// Mantem o modal de criacao aberto para exibir erros de validacao.
-$reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
-    && isset($_POST["acao"])
-    && $_POST["acao"] === "criar"
-    && !empty($erro));
+// Apos enviar a criacao, erros aparecem na pagina e o modal volta fechado.
+$reabrirModal = false;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -180,9 +199,9 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
             </div>
 
             <div class="campo">
-                <label for="dataFim">Data de encerramento <span style="font-weight:400;text-transform:none">(opcional)</span></label>
+                <label for="dataFim">Data de encerramento</label>
                 <input type="date" id="dataFim" name="dataFim"
-                       value="<?= htmlspecialchars($_POST['dataFim'] ?? '') ?>">
+                       value="<?= htmlspecialchars($_POST['dataFim'] ?? '') ?>" required>
             </div>
 
             <button type="submit" class="btn-primario">Criar liga</button>
@@ -275,25 +294,28 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
         <!-- Ranking semanal -->
         <?php
         if ($ehLigaDoJogo) {
-            // Liga Oficial: melhor resultado obtido nos ultimos sete dias.
+            // Liga Oficial: semana fixa calculada a partir da dataCriacao da liga.
             $stmtSem = mysqli_prepare($conexao,
                 "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM usuarios u
+                 INNER JOIN liga l ON l.id = ?
                  LEFT JOIN partida p ON p.usuario_id = u.id
-                     AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                     AND p.dataPartida >= DATE_ADD(l.dataCriacao, INTERVAL FLOOR(TIMESTAMPDIFF(SECOND, l.dataCriacao, NOW()) / 604800) * 604800 SECOND)
+                     AND p.dataPartida < DATE_ADD(l.dataCriacao, INTERVAL (FLOOR(TIMESTAMPDIFF(SECOND, l.dataCriacao, NOW()) / 604800) + 1) * 604800 SECOND)
                  GROUP BY u.id, u.nome
                  ORDER BY total DESC"
             );
+            mysqli_stmt_bind_param($stmtSem, "i", $liga["id"]);
         } else {
-            // Liga criada: aplica semana, entrada do membro e encerramento da liga.
+            // Liga criada: mesma semana fixa, respeitando entrada do membro e dataFim.
             $stmtSem = mysqli_prepare($conexao,
                 "SELECT u.nome, COALESCE(MAX(p.pontuacao), 0) AS total
                  FROM ligaUsuario lu
                  INNER JOIN liga l ON l.id = lu.liga_id
                  INNER JOIN usuarios u ON u.id = lu.usuario_id
                  LEFT JOIN partida p ON p.usuario_id = lu.usuario_id
-                     AND p.dataPartida >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                     -- A semana tambem respeita a entrada do jogador e o fim da liga.
+                     AND p.dataPartida >= DATE_ADD(l.dataCriacao, INTERVAL FLOOR(TIMESTAMPDIFF(SECOND, l.dataCriacao, NOW()) / 604800) * 604800 SECOND)
+                     AND p.dataPartida < DATE_ADD(l.dataCriacao, INTERVAL (FLOOR(TIMESTAMPDIFF(SECOND, l.dataCriacao, NOW()) / 604800) + 1) * 604800 SECOND)
                      AND p.dataPartida >= lu.dataEntrada
                      AND (l.dataFim IS NULL OR p.dataPartida < DATE_ADD(l.dataFim, INTERVAL 1 DAY))
                  WHERE lu.liga_id = ?
@@ -306,7 +328,7 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
         $resSem = mysqli_stmt_get_result($stmtSem);
         ?>
 
-        <!-- No ranking semanal, a melhor partida e limitada aos ultimos sete dias. -->
+        <!-- No ranking semanal, a melhor partida fica dentro da semana atual da liga. -->
         <p class="ranking-titulo">Ranking semanal</p>
         <table>
             <thead>

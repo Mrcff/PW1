@@ -109,6 +109,7 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
 }
 mysqli_stmt_close($stmt);
 
+//maior pontuacao semanal
 $semanas = [];
 $segundaAtual = new DateTimeImmutable("monday this week");
 for ($i = 7; $i >= 0; $i--) {
