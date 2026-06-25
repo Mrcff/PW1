@@ -41,4 +41,29 @@ O uso de IA foi permitido para as seguintes finalidades:
 
 ---
 
+### Interação 2
+
+- Data: 22/06/2026
+- Etapa do Projeto: 2 - Desenvolvimento dos Sprites/personagens
+- Ferramenta de IA Utilizada: GPT Codex 5.5
+- Objetivo da Consulta: Entender qual seria a melhor forma de renderizar personagens usando uma imagem PNG em formato de sprite sheet 3x3, especialmente diferenciando o atendente animado dos clientes estáticos.
+
+- Prompt(s) Utilizado(s):
+  1. “Qual a melhor tecnologia para aplicar personagens de animação com PNG definidos por 3x3? Podemos planejar uma implementação para essa aplicação.”
+  2. “Pode me explicar como posso usar sprite sheet no game.css e game.js, trocando as frames apenas do atendente?”
+
+- Resumo da Resposta da IA:
+  A IA explicou que, para este projeto, a melhor abordagem seria usar sprite sheet com CSS e JavaScript, em vez de várias imagens separadas ou canvas. Como a imagem PNG estava organizada em uma grade 3x3, a IA sugeriu controlar o frame exibido por meio da propriedade `background-position`. Também explicou que o CSS deveria usar `background-size: 300% 300%`, pois a imagem possui três colunas e três linhas. No JavaScript, a IA orientou a mapear os frames por direção, usando objetos com `coluna` e `linha`, e alternar os frames conforme o personagem se movimenta.
+
+- Análise e Aplicação:
+  A explicação ajudou a organizar a implementação dos personagens no jogo. Foi definido que o atendente teria animação, pois ele se movimenta pelo cenário, enquanto os clientes seriam renderizados de forma mais estática nas mesas. No caso do atendente, o JavaScript controla a direção e o frame atual com base no movimento do jogador. Já o CSS é responsável por exibir apenas uma parte da imagem do sprite sheet.
+
+  Com a recomendação da IA, foi possível reaproveitar o PNG já definido anteriormente, sem precisar separar manualmente cada frame em arquivos diferentes. A solução também permitiu manter os clientes como sprites estáticos, enquanto apenas o atendente trocade frame durante a movimentação.
+
+- Referência no Código:
+  A lógica foi aplicada nos arquivos:
+    - `front-end/css/game.css`, na classe `.garcom-sprite`, onde o sprite sheet é configurado com `background-size: 300% 300%`, `background-position` e `image-rendering: pixelated`.
+    - `front-end/scripts/game.js`, nas constantes `FRAMES_GARCOM` e `INTERVALO_FRAME_GARCOM_MS`, e nas funções `configurarSpriteGarcom()`, `renderizarSpriteGarcom()` e `atualizarAnimacaoGarcom()`.
+
+---
 

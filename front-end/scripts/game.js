@@ -681,7 +681,7 @@ function garimpar(valor, min, max) {
   return Math.max(min, Math.min(max, valor));
 }
 
-//cod2319
+
 //f:sincronizarLayoutSalao
 function sincronizarLayoutSalao() {
   if (cenarioSala.classList.contains("hidden")) {
@@ -693,7 +693,6 @@ function sincronizarLayoutSalao() {
   atualizarBotao();
 }
 
-//cod2319
 //f:agendarSincronizacaoLayoutSalao
 function agendarSincronizacaoLayoutSalao() {
   window.requestAnimationFrame(() => {
@@ -701,7 +700,7 @@ function agendarSincronizacaoLayoutSalao() {
   });
 }
 
-//cod2319
+
 //f:atualizarPosicaoGarcom
 function atualizarPosicaoGarcom() {
   const r = chao.getBoundingClientRect();
@@ -853,7 +852,7 @@ function moverGarcom(deltaX, deltaY) {
   }
 }
 
-//cod2319
+
 //f:recalcularPosicaoGarcomAposResize
 function recalcularPosicaoGarcomAposResize() {
   const r = chao.getBoundingClientRect();
@@ -1012,7 +1011,7 @@ function iniciarPedido(mesa) {
   window.setTimeout(() => pedidoInput.focus(), 120);
 }
 
-//cod2319
+
 //f:cancelarPedido
 function cancelarPedido() {
   const mesa = jogoEstado.mesaAtualCancelavel;
@@ -1073,7 +1072,6 @@ function cancelarPedido() {
   atualizarBotao();
 }
 
-//cod2319
 //f:finalizarPedido
 function finalizarPedido() {
   jogoEstado.modo = "salao";
@@ -1248,7 +1246,6 @@ function sairParaInicio() {
   limparPartidaLocal();
 }
 
-//cod2319
 //f:iniciarJogo
 function iniciarJogo() {
   limparPartidaLocal();
@@ -1274,7 +1271,7 @@ function iniciarJogo() {
   iniciarLoop();
 }
 
-//cod2319
+
 //f:reiniciarJogo
 function reiniciarJogo() {
   limparPartidaLocal();
@@ -1299,7 +1296,7 @@ function reiniciarJogo() {
 // Envia a pontuação e o nível para o banco de dados ao fim de cada nível ou game over.
 async function salvarPontuacao(pontuacao, nivel) {
   try {
-    // await pausa a função até o servidor responder — mas não trava o jogo,salvarPontuacao() não usou await (fire and forget)
+    // await pausa a função até o servidor responder — mas não trava o jogo,salvarPontuacao()
     const res = await fetch("score.php", {
       method: "POST", // envia dados
       headers: { "Content-Type": "application/json" }, // avisa o PHP que vem JSON
@@ -1322,7 +1319,6 @@ async function salvarPontuacao(pontuacao, nivel) {
 // EVENTOS
 //========================
 
-//cod2319
 window.addEventListener("resize", () => {
   if (cenarioSala.classList.contains("hidden")) {
     jogoEstado.resizePendente = true;
