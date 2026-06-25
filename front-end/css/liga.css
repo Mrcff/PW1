@@ -1,0 +1,283 @@
+/* ============================================================
+   LIGA
+   Depende de pages.css para tokens e header.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
+
+/* ── Topo decorativo ─────────────────────────────────────── 
+body::before {
+  padding-top: 56px;
+  content: "";
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cafe-escuro), var(--laranja), var(--vinho));
+}*/
+
+/* ── Título da página ────────────────────────────────────── */
+.liga-page-titulo {
+  text-align: center;
+  padding: 40px 20px 10px;
+  max-width: 860px;
+  margin: 0 auto;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cafe-escuro);
+}
+
+.liga-page-titulo::after {
+  content: "★ ★ ★ ★ ★";
+  display: block;
+  font-size: 14px;
+  color: var(--laranja);
+  letter-spacing: .25em;
+  margin-top: 6px;
+}
+
+/* ── Ações do topo ───────────────────────────────────────── */
+.acoes-topo {
+  max-width: 860px;
+  margin: 28px auto 0;
+  padding: 0 20px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(80,55,25,.45);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.aberto { display: flex; }
+
+.modal {
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: 18px;
+  padding: 34px 38px 30px;
+  width: 100%;
+  max-width: 480px;
+  margin: 20px;
+  box-shadow: 0 12px 40px rgba(100,70,20,.22);
+  position: relative;
+  animation: modalEntrar .2s ease;
+}
+
+@keyframes modalEntrar {
+  from { opacity: 0; transform: translateY(-14px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+.modal-titulo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--cafe-escuro);
+  margin-bottom: 26px;
+}
+
+.modal-fechar {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--cafe-claro);
+  cursor: pointer;
+  line-height: 1;
+  transition: color .15s;
+}
+
+.modal-fechar:hover { color: var(--cafe-escuro); }
+
+/* ── Campos ──────────────────────────────────────────────── */
+.campo { margin-bottom: 20px; }
+
+.campo label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--cafe-medio);
+  margin-bottom: 7px;
+}
+
+.campo input[type="text"],
+.campo input[type="date"] {
+  width: 100%;
+  padding: 10px 13px;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio-sm);
+  background: #fffdf9;
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.campo input:focus {
+  border-color: var(--vinho);
+  box-shadow: 0 0 0 3px rgba(171,53,53,.14);
+  background: var(--superficie);
+}
+
+input[type="hidden"] { display: none; }
+
+/* ── Divisor ─────────────────────────────────────────────── */
+hr {
+  max-width: 860px;
+  margin: 40px auto;
+  border: none;
+  border-top: 2px dashed var(--borda);
+}
+
+/* ── Seções e títulos ────────────────────────────────────── */
+.secao-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--cafe-medio);
+  max-width: 860px;
+  margin: 40px auto 24px;
+  padding: 0 20px;
+}
+
+/* ── Card de liga ────────────────────────────────────────── */
+.liga-card {
+  max-width: 860px;
+  margin: 0 auto 48px;
+  padding: 0 20px;
+}
+
+.liga-nome {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--cafe-escuro);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.liga-nome::before { content: "🏆"; font-size: 1rem; }
+
+.liga-info {
+  font-size: 13px;
+  color: var(--texto-suave);
+  margin-bottom: 4px;
+  line-height: 1.55;
+}
+
+/* ── Form entrar ─────────────────────────────────────────── */
+.form-entrar {
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 20px 22px;
+  margin: 22px 0 30px;
+  box-shadow: 0 2px 8px rgba(160,130,90,.09);
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-entrar .campo { flex: 1; min-width: 200px; margin-bottom: 0; }
+
+/* ── Rankings ────────────────────────────────────────────── */
+.ranking-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--azul);
+  margin: 28px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ranking-titulo::after { content: ""; flex: 1; height: 2px; background: var(--borda); border-radius: 2px; }
+
+/* ── Tabela ──────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(160,130,90,.08);
+  margin-bottom: 10px;
+}
+
+table th, table td {
+  padding: 12px 18px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #ede3d0;
+}
+
+table tr:last-child td { border-bottom: none; }
+
+table thead th {
+  background: #eadbc9;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--cafe-medio);
+}
+
+table td:first-child, table th:first-child {
+  width: 50px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--vinho);
+}
+
+table tbody tr:first-child td:first-child { color: var(--laranja); font-size: 1.1rem; }
+table tbody tr:first-child td             { background: rgba(251,162,86,.10); }
+table tbody tr:hover td                   { background: #f8eee3; }
+
+table td:last-child, table th:last-child  { font-weight: 700; color: var(--cafe-escuro); }
+
+/* ── Estado vazio ────────────────────────────────────────── */
+.vazio {
+  text-align: center;
+  color: var(--cafe-medio);
+  font-style: italic;
+  margin: 36px auto;
+  max-width: 860px;
+  padding: 0 20px;
+}
+
+/* ── Feedback inline ─────────────────────────────────────── */
+.msg-liga-erro { max-width: 860px; margin: 20px auto 0; padding: 0 20px; }
+.msg-liga-erro p { padding: 12px 18px; border-radius: var(--raio-sm); border-left: 4px solid var(--vinho); background: #fae0dc; color: var(--vinho); font-weight: 600; }
+
+/* ── Responsivo ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .liga-page-titulo { font-size: 1.4rem; padding-top: 28px; }
+  .modal { padding: 26px 20px 22px; }
+  .form-entrar { flex-direction: column; }
+  .acoes-topo { justify-content: stretch; }
+  .acoes-topo .btn-primario { flex: 1; justify-content: center; }
+}
