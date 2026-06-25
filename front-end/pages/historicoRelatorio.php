@@ -88,13 +88,13 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
 }
 mysqli_stmt_close($stmt);
 
-//7 ultimos dias da semama
+//busca por pontuacoes
 $resumoSemanal = [];
 $stmt = mysqli_prepare(
     $conexao,
     "SELECT DATE_SUB(DATE(dataPartida), INTERVAL WEEKDAY(dataPartida) DAY) AS inicio_semana,
             COUNT(*) AS partidas,
-            SUM(pontuacao) AS pontuacao
+            MAX(pontuacao) AS pontuacao
      FROM partida
      WHERE usuario_id = ?
        AND dataPartida >= DATE_SUB(CURDATE(), INTERVAL 7 WEEK)
@@ -109,7 +109,7 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
 }
 mysqli_stmt_close($stmt);
 
-//maior pontuacao semanal
+//organiza 8 semanas para exibir
 $semanas = [];
 $segundaAtual = new DateTimeImmutable("monday this week");
 for ($i = 7; $i >= 0; $i--) {
