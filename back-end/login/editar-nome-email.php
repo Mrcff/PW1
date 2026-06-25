@@ -115,6 +115,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editando Nome/Email</title>
     <link rel="stylesheet" href="../../front-end/css/auth.css">
+    <link rel="stylesheet" href="../../front-end/css/pages.css">
+    <script src="../../front-end/scripts/pages-script.js" defer></script>
 </head>
 <body class="auth-page">
     <main class="auth-shell">

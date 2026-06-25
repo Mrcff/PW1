@@ -14,6 +14,7 @@ if (!isset($_SESSION["usuario_id"])) {
         <title>Game</title>
         <link rel="stylesheet" href="../css/game.css">
         <link rel="stylesheet" href="../css/pages.css">
+        <script src="../scripts/pages-script.js" defer></script>
         <script src="../data/cenarios.js" defer></script>
         <script src="../data/personagens.js" defer></script>
         <script src="../scripts/game.js" defer></script>
@@ -26,7 +27,7 @@ if (!isset($_SESSION["usuario_id"])) {
 <!-- TELA DE INÍCIO ======================================== -->
             <section class="tela-inicio" id="tela-inicio">
                 <div class="inicio-conteudo">
-                    <h1 class="inicio-titulo">Título TBD!</h1>
+                    <h1 class="inicio-titulo">Café sem Fronteiras!</h1>
                     <p class="inicio-desc">Anote os pedidos, entregue na cozinha e não deixe os clientes esperando.</p>
                     <div class="inicio-dicas">
                         <span>🕹️ Use WASD ou setas para andar</span>

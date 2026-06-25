@@ -1,26 +1,28 @@
 <?php
-$base = "/PW1/front-end/";
+/**
+ * session-data.php (antigo menu.php)
+ * 
+ * Inclua este arquivo no <head> de cada página PHP, ANTES do pages-script.js.
+ * Ele emite uma única variável JS com os dados de sessão necessários.
+ * O header em si é montado inteiramente pelo pages-script.js.
+ * 
+ * Uso:
+ *   <?php
+ *     session_start();
+ *     require_once "../includes/session-data.php";
+ *   ?>
+ */
+
+// Garante que a sessão está ativa sem iniciá-la duas vezes
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
-<header class="site-header">
-
-    <a href="<?= $base ?>index.php" class="header-logo">
-        Café sem Fronteiras
-    </a>
-
-    <nav class="header-nav">
-        <a href="<?= $base ?>index.php">Início</a>
-        <a href="<?= $base ?>pages/tutorial.php">Tutorial</a>
-        <a href="<?= $base ?>pages/game.php">Jogo</a>
-        <a href="<?= $base ?>pages/liga.php">Liga</a>
-    </nav>
-
-    <div class="header-right">
-        <?php if (isset($_SESSION["usuario_id"])): ?>
-            <span>Olá, <?= htmlspecialchars($_SESSION["usuario_nome"]) ?></span>
-            <a href="/PW1/back-end/login/logout.php">Sair</a>
-        <?php else: ?>
-            <a href="/PW1/back-end/login/login.php">Login</a>
-        <?php endif; ?>
-    </div>
-
-</header>
+<script>
+  window.usuarioLogado = <?= isset($_SESSION["usuario_id"])
+    ? json_encode([
+        "id"   => (int)  $_SESSION["usuario_id"],
+        "nome" => htmlspecialchars((string) $_SESSION["usuario_nome"], ENT_QUOTES, "UTF-8"),
+      ])
+    : "null" ?>;
+</script>

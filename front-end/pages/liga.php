@@ -1,14 +1,11 @@
 <?php
-// Inicia a sessao para identificar o jogador logado.
 session_start();
 
-// A pagina de ligas exige autenticacao.
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: ../../back-end/login/login.php");
     exit;
 }
 
-// Carrega a conexao com o banco e as funcoes da Liga Oficial.
 require_once __DIR__ . "/../../back-end/banco/conexao.php";
 require_once __DIR__ . "/../../back-end/liga/liga-oficial.php";
 
@@ -136,21 +133,22 @@ $reabrirModal = ($_SERVER["REQUEST_METHOD"] === "POST"
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ligas</title>
-    <link rel="stylesheet" href="../css/pages.css">
     <link rel="stylesheet" href="../css/liga.css">
+    <link rel="stylesheet" href="../css/pages.css">
+    <script src="../scripts/pages-script.js" defer></script>
 </head>
 <body>
 
 <?php require_once __DIR__ . "/../components/menu.php"; ?>
 
-<h1>Ligas</h1>
+<h1 class="liga-page-titulo">Ligas</h1>
 
 <?php if ($erro): ?>
-    <p style="color: red;"><?= htmlspecialchars($erro) ?></p>
+    <p class="msg-erro"><?= htmlspecialchars($erro) ?></p>
 <?php endif; ?>
 
 <?php if ($mensagem): ?>
-    <p style="color: green;"><?= htmlspecialchars($mensagem) ?></p>
+    <p class="msg-ok"><?= htmlspecialchars($mensagem) ?></p>
 <?php endif; ?>
 
 <!-- Botão que abre o modal -->

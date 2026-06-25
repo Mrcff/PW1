@@ -132,9 +132,10 @@ mysqli_close($conexao);
     <title>Histórico e Relatório</title>
     <link rel="stylesheet" href="../css/pages.css">
     <link rel="stylesheet" href="../css/historicoRelatorio.css">
+    <script src="../scripts/pages-script.js" defer></script>
+
 </head>
 <body>
-<?php require_once __DIR__ . "/../components/menu.php"; ?>
 
 <main class="relatorio-container">
     <div class="relatorio-topo">

@@ -1,5 +1,4 @@
 // Estados: "inicio" | "salao" | "pedindo" | "pausado" | "entre-levels" | "gameover"
-//cod2319
 //obj:jogoEstado
 const jogoEstado = {
   level: 1,
@@ -35,7 +34,7 @@ const jogoEstado = {
   dialogoTimers: [],
   spawnAgendados: [],
   spawnInterval: null,
-  loopRodando: false,
+  loopRodando: false
 };
 
 //====================
@@ -202,9 +201,9 @@ function restaurarPartidaLocal() {
     jogoEstado.scoreInicioLevel = Number(partida.scoreInicioLevel) || 0;
     jogoEstado.estrelasRestaurante = Number(partida.estrelasRestaurante) || 5;
     jogoEstado.ultimoCenarioId = partida.ultimoCenarioId ?? null;
-    jogoEstado.cenarioAtual =
-      pegarCenariosJogo().find((cenario) => cenario.id === partida.cenarioId) ??
-      null;
+    jogoEstado.cenarioAtual = pegarCenariosJogo().find(
+      (cenario) => cenario.id === partida.cenarioId,
+    ) ?? null;
     jogoEstado.modo = "salao";
 
     telaInicio.classList.add("hidden");
@@ -294,8 +293,6 @@ function cooldownSpawn(baseMs) {
   const delta = Math.floor(baseMs * 0.2);
   return baseMs - delta + Math.floor(Math.random() * (delta * 2 + 1));
 }
-
-//cod2319
 //f:criarLevel
 function criarLevel(level, sortearNovoCenario = false) {
   limparTimersLevel();
@@ -337,7 +334,6 @@ function criarLevel(level, sortearNovoCenario = false) {
   agendarSpawn(tentarSpawnProximo, 1200);
 }
 
-//cod2319
 //f:tentarSpawnProximo
 function tentarSpawnProximo() {
   if (jogoEstado.clientesNaFila <= 0) return;
@@ -375,8 +371,8 @@ function tentarSpawnProximo() {
   spawnCliente(mesaLivre, params);
 
   if (jogoEstado.clientesNaFila > 0) {
-    agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
-  }
+        agendarSpawn(tentarSpawnProximo, cooldownSpawn(params.cooldownSpawnMs));
+    }
 }
 
 //f:limparTimersLevel
@@ -391,46 +387,39 @@ function limparTimersLevel() {
   });
 }
 
-//cod2319
 //f:agendarSpawn
 function agendarSpawn(fn, delayMs) {
-  const entrada = { timerId: null, disparoEm: Date.now() + delayMs, fn };
-  entrada.timerId = window.setTimeout(() => {
-    jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter(
-      (s) => s !== entrada,
-    );
-    fn();
-  }, delayMs);
-  jogoEstado.spawnAgendados.push(entrada);
+    const entrada = { timerId: null, disparoEm: Date.now() + delayMs, fn };
+    entrada.timerId = window.setTimeout(() => {
+        jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((s) => s !== entrada);
+        fn();
+    }, delayMs);
+    jogoEstado.spawnAgendados.push(entrada);
 }
 
-//cod2319
 //f:pausarSpawns
 function pausarSpawns() {
-  const agora = Date.now();
-  jogoEstado.spawnAgendados.forEach((s) => {
-    window.clearTimeout(s.timerId);
-    s.timerId = null;
-    s.restanteMs = Math.max(0, s.disparoEm - agora);
-  });
+    const agora = Date.now();
+    jogoEstado.spawnAgendados.forEach((s) => {
+        window.clearTimeout(s.timerId);
+        s.timerId = null;
+        s.restanteMs = Math.max(0, s.disparoEm - agora);
+    });
 }
 
-//cod2319
 //f:retornarSpawns
 function retornarSpawns() {
-  const pendentes = [...jogoEstado.spawnAgendados];
-  jogoEstado.spawnAgendados = [];
-  pendentes.forEach((s) => {
-    const delay = s.restanteMs ?? 0;
-    const entrada = { timerId: null, disparoEm: Date.now() + delay, fn: s.fn };
-    entrada.timerId = window.setTimeout(() => {
-      jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter(
-        (x) => x !== entrada,
-      );
-      entrada.fn();
-    }, delay);
-    jogoEstado.spawnAgendados.push(entrada);
-  });
+    const pendentes = [...jogoEstado.spawnAgendados];
+    jogoEstado.spawnAgendados = [];
+    pendentes.forEach((s) => {
+        const delay = s.restanteMs ?? 0;
+        const entrada = { timerId: null, disparoEm: Date.now() + delay, fn: s.fn };
+        entrada.timerId = window.setTimeout(() => {
+            jogoEstado.spawnAgendados = jogoEstado.spawnAgendados.filter((x) => x !== entrada);
+            entrada.fn();
+        }, delay);
+        jogoEstado.spawnAgendados.push(entrada);
+    });
 }
 
 //f:spawnCliente
@@ -578,6 +567,7 @@ function irProximaFase() {
   atualizarBotao();
 }
 
+//cod2319
 //f:tentarNovamenteFase
 function tentarNovamenteFase() {
   entreLevelModal.classList.add("hidden");
@@ -619,9 +609,8 @@ function criarMesasFisicas(quant) {
   }
 
   function posicaoDisponivel(x, y) {
-    return (
-      !sobrepoe(x, y, areaCozinha) &&
-      !posicoes.some((posicao) => sobrepoe(x, y, posicao))
+    return !sobrepoe(x, y, areaCozinha) && !posicoes.some((posicao) =>
+      sobrepoe(x, y, posicao),
     );
   }
 
@@ -671,6 +660,7 @@ function criarMesasFisicas(quant) {
   }));
 }
 
+//cod2319
 //f:posicaoMesas
 function posicaoMesas() {
   const r = chao.getBoundingClientRect();
@@ -691,6 +681,27 @@ function garimpar(valor, min, max) {
   return Math.max(min, Math.min(max, valor));
 }
 
+//cod2319
+//f:sincronizarLayoutSalao
+function sincronizarLayoutSalao() {
+  if (cenarioSala.classList.contains("hidden")) {
+    jogoEstado.resizePendente = true;
+    return;
+  }
+  posicaoMesas();
+  recalcularPosicaoGarcomAposResize();
+  atualizarBotao();
+}
+
+//cod2319
+//f:agendarSincronizacaoLayoutSalao
+function agendarSincronizacaoLayoutSalao() {
+  window.requestAnimationFrame(() => {
+    sincronizarLayoutSalao();
+  });
+}
+
+//cod2319
 //f:atualizarPosicaoGarcom
 function atualizarPosicaoGarcom() {
   const r = chao.getBoundingClientRect();
@@ -718,7 +729,9 @@ function renderizarSpriteGarcom() {
   const frame = frames[jogoEstado.garcom.frame] ?? frames[0];
 
   garcomSprite.style.backgroundPosition = `${frame.coluna * 50}% ${frame.linha * 50}%`;
-  garcomSprite.classList.remove("garcom-sprite-espelhado");
+  garcomSprite.classList.remove(
+    "garcom-sprite-espelhado",
+  );
 }
 
 //f:atualizarAnimacaoGarcom
@@ -733,10 +746,7 @@ function atualizarAnimacaoGarcom(tempoAtual, deltaX, deltaY) {
       jogoEstado.garcom.direcao = deltaY > 0 ? "front" : "back";
     }
 
-    if (
-      !jogoEstado.garcom.andando ||
-      direcaoAnterior !== jogoEstado.garcom.direcao
-    ) {
+    if (!jogoEstado.garcom.andando || direcaoAnterior !== jogoEstado.garcom.direcao) {
       jogoEstado.garcom.frame = 0;
       jogoEstado.garcom.ultimoFrameAnimacao = tempoAtual;
     } else if (
@@ -802,16 +812,12 @@ function posicionarGarcomNoBalcao() {
   const maxY = chaoRect.height - garcomRect.height;
 
   jogoEstado.garcom.x = garimpar(
-    cozinhaRect.left -
-      chaoRect.left +
-      (cozinhaRect.width - garcomRect.width) / 2,
+    cozinhaRect.left - chaoRect.left + (cozinhaRect.width - garcomRect.width) / 2,
     0,
     maxX,
   );
   jogoEstado.garcom.y = garimpar(
-    cozinhaRect.top -
-      chaoRect.top +
-      (cozinhaRect.height - garcomRect.height) / 2,
+    cozinhaRect.top - chaoRect.top + (cozinhaRect.height - garcomRect.height) / 2,
     0,
     maxY,
   );
@@ -847,6 +853,7 @@ function moverGarcom(deltaX, deltaY) {
   }
 }
 
+//cod2319
 //f:recalcularPosicaoGarcomAposResize
 function recalcularPosicaoGarcomAposResize() {
   const r = chao.getBoundingClientRect();
@@ -911,7 +918,6 @@ function atualizarBotao() {
   interactBtn.onclick = acao.action;
 }
 
-//cod2319
 //f:controlesJogo
 function controlesJogo(tempoAtual) {
   if (jogoEstado.modo === "salao") {
@@ -938,12 +944,11 @@ function controlesJogo(tempoAtual) {
   if (jogoEstado.loopRodando) requestAnimationFrame(controlesJogo);
 }
 
-//cod2319
 //f:iniciarLoop
 function iniciarLoop() {
-  if (jogoEstado.loopRodando) return;
-  jogoEstado.loopRodando = true;
-  requestAnimationFrame(controlesJogo);
+    if (jogoEstado.loopRodando) return;
+    jogoEstado.loopRodando = true;
+    requestAnimationFrame(controlesJogo);
 }
 
 //f:renderizarDialogo
@@ -1195,23 +1200,21 @@ function bloquearCola() {
   });
 }
 
-//cod2319
 //f:abrirPausa
 function abrirPausa() {
   jogoEstado.modo = "pausado";
   jogoEstado.keys.clear();
   pausarBarras();
-  pausarSpawns(); //essa chamada de função
+  pausarSpawns(); 
   pausaModal.classList.remove("hidden");
 }
 
-//cod2319
 //f:fecharPausa
 function fecharPausa() {
   pausaModal.classList.add("hidden");
   jogoEstado.modo = "salao";
   retornarBarras();
-  retornarSpawns(); //essa chamada de função
+  retornarSpawns(); 
 }
 
 //f:reiniciarLevel
@@ -1229,13 +1232,12 @@ function reiniciarLevel() {
   atualizarBotao();
 }
 
-//cod2319
 //f:sairParaInicio
 function sairParaInicio() {
   pausaModal.classList.add("hidden");
   limparTimersLevel();
   jogoEstado.modo = "inicio";
-  jogoEstado.loopRodando = false; //foi só essa linha
+  jogoEstado.loopRodando = false;
   jogoEstado.keys.clear();
   jogoHud.classList.add("hidden");
   cenarioSala.classList.add("hidden");
@@ -1272,6 +1274,7 @@ function iniciarJogo() {
   iniciarLoop();
 }
 
+//cod2319
 //f:reiniciarJogo
 function reiniciarJogo() {
   limparPartidaLocal();
@@ -1330,8 +1333,6 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("pagehide", salvarPartidaLocal);
-
-//cod2319
 window.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
 
@@ -1346,10 +1347,7 @@ window.addEventListener("keydown", (event) => {
     if (jogoEstado.modo === "pedindo") return;
     const modoAtivo = ["salao", "pausado", "entre-levels", "gameover"];
     if (modoAtivo.includes(jogoEstado.modo)) event.preventDefault();
-    if (
-      jogoEstado.modo === "salao" &&
-      !interactBtn.classList.contains("hidden")
-    ) {
+    if (jogoEstado.modo === "salao" && !interactBtn.classList.contains("hidden")) {
       interactBtn.click();
     }
     return;

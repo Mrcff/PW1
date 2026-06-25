@@ -9,9 +9,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Final Web I</title>
+    <title>Café sem Fronteiras</title>
     <link rel="stylesheet" href="css/pages.css">
-
+    <script src="scripts/pages-script.js" defer></script>
 </head>
 
 <body class="home-page">

@@ -1,473 +1,283 @@
+/* ============================================================
+   LIGA
+   Depende de pages.css para tokens e header.
+   ============================================================ */
+
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
 
-body {
-  font-family: "Times New Roman", Times, serif;
-  background-color: #f0e8d5;
-  color: #5c4a32;
-  min-height: 100vh;
-  padding-bottom: 80px;
-}
-
-/* Faixa topo HUD */
+/* ── Topo decorativo ─────────────────────────────────────── 
 body::before {
+  padding-top: 56px;
   content: "";
   display: block;
-  height: 8px;
-  background: linear-gradient(90deg, #c9a97a, #d4a84b, #c9a97a);
-}
+  height: 4px;
+  background: linear-gradient(90deg, var(--cafe-escuro), var(--laranja), var(--vinho));
+}*/
 
-/* Título da página */
-h1 {
+/* ── Título da página ────────────────────────────────────── */
+.liga-page-titulo {
   text-align: center;
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #7a5c3a;
   padding: 40px 20px 10px;
   max-width: 860px;
   margin: 0 auto;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cafe-escuro);
 }
 
-h1::after {
+.liga-page-titulo::after {
   content: "★ ★ ★ ★ ★";
   display: block;
-  font-size: 1rem;
-  color: #d4a84b;
-  letter-spacing: 0.25em;
+  font-size: 14px;
+  color: var(--laranja);
+  letter-spacing: .25em;
   margin-top: 6px;
 }
 
-/* Mensagens de feedback */
-.msg-erro,
-.msg-ok,
-p[style*="color: red"],
-p[style*="color: green"] {
-  max-width: 860px;
-  margin: 24px auto 0;
-  padding: 14px 22px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-p[style*="color: red"],
-.msg-erro {
-  background-color: #fae0dc;
-  color: #9b3a2a !important;
-  border-left: 4px solid #c0503a;
-}
-
-p[style*="color: green"],
-.msg-ok {
-  background-color: #ddf0e2;
-  color: #2e6b42 !important;
-  border-left: 4px solid #4a9a65;
-}
-
-/* Barra de ações do topo */
+/* ── Ações do topo ───────────────────────────────────────── */
 .acoes-topo {
   max-width: 860px;
-  margin: 36px auto 0;
+  margin: 28px auto 0;
   padding: 0 20px;
   display: flex;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
   justify-content: space-between;
 }
 
-/* ── Botão primário (dourado) ── */
-.btn-primario {
-  display: inline-block;
-  padding: 11px 28px;
-  background: linear-gradient(135deg, #d4a84b, #c9953a);
-  color: #fff;
-  font-family: "Times New Roman", Times, serif;
-  font-size: 0.9rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border: none;
-  border-radius: 9px;
-  cursor: pointer;
-  box-shadow: 0 3px 10px rgba(180, 130, 50, 0.35);
-  text-decoration: none;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
-}
-
-.btn-primario:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(180, 130, 50, 0.45);
-}
-
-.btn-primario:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(180, 130, 50, 0.3);
-}
-
-/* ── MODAL ── */
+/* ── Modal ───────────────────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(80, 55, 25, 0.45);
+  background: rgba(80,55,25,.45);
   backdrop-filter: blur(3px);
   z-index: 100;
   align-items: center;
   justify-content: center;
 }
 
-.modal-overlay.aberto {
-  display: flex;
-}
+.modal-overlay.aberto { display: flex; }
 
 .modal {
-  background: #fdfaf4;
-  border: 2px solid #ddd0b8;
+  background: var(--superficie);
+  border: 2px solid var(--borda);
   border-radius: 18px;
-  padding: 36px 40px 32px;
+  padding: 34px 38px 30px;
   width: 100%;
   max-width: 480px;
   margin: 20px;
-  box-shadow: 0 12px 40px rgba(100, 70, 20, 0.25);
+  box-shadow: 0 12px 40px rgba(100,70,20,.22);
   position: relative;
-  animation: modalEntrar 0.2s ease;
+  animation: modalEntrar .2s ease;
 }
 
 @keyframes modalEntrar {
-  from {
-    opacity: 0;
-    transform: translateY(-16px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-14px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
 
 .modal-titulo {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #7a5c3a;
-  margin-bottom: 28px;
+  letter-spacing: .08em;
+  color: var(--cafe-escuro);
+  margin-bottom: 26px;
 }
 
 .modal-fechar {
   position: absolute;
-  top: 16px;
-  right: 18px;
+  top: 14px;
+  right: 16px;
   background: none;
   border: none;
   font-size: 1.4rem;
-  color: #b08a5a;
+  color: var(--cafe-claro);
   cursor: pointer;
   line-height: 1;
-  transition: color 0.15s;
+  transition: color .15s;
 }
 
-.modal-fechar:hover {
-  color: #7a5c3a;
-}
+.modal-fechar:hover { color: var(--cafe-escuro); }
 
-/* ── Campos de formulário (modal e inline) ── */
-.campo {
-  margin-bottom: 22px;
-}
+/* ── Campos ──────────────────────────────────────────────── */
+.campo { margin-bottom: 20px; }
 
 .campo label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #8a6844;
+  letter-spacing: .07em;
+  color: var(--cafe-medio);
   margin-bottom: 7px;
 }
 
 .campo input[type="text"],
 .campo input[type="date"] {
   width: 100%;
-  padding: 10px 14px;
-  border: 2px solid #ddd0b8;
-  border-radius: 8px;
-  background: #f7f2e8;
-  color: #5c4a32;
-  font-family: "Times New Roman", Times, serif;
-  font-size: 0.95rem;
+  padding: 10px 13px;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio-sm);
+  background: #fffdf9;
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 14px;
   outline: none;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color .2s, box-shadow .2s;
 }
 
 .campo input:focus {
-  border-color: #c9a97a;
-  box-shadow: 0 0 0 3px rgba(201, 169, 122, 0.25);
-  background: #fffdf7;
+  border-color: var(--vinho);
+  box-shadow: 0 0 0 3px rgba(171,53,53,.14);
+  background: var(--superficie);
 }
 
-input[type="hidden"] {
-  display: none;
-}
+input[type="hidden"] { display: none; }
 
-/* ── Divisor ── */
+/* ── Divisor ─────────────────────────────────────────────── */
 hr {
   max-width: 860px;
-  margin: 44px auto;
+  margin: 40px auto;
   border: none;
-  border-top: 2px dashed #ddd0b8;
+  border-top: 2px dashed var(--borda);
 }
 
-/* ── Seção "Suas Ligas" ── */
+/* ── Seções e títulos ────────────────────────────────────── */
 .secao-titulo {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #8a6844;
+  letter-spacing: .1em;
+  color: var(--cafe-medio);
   max-width: 860px;
-  margin: 44px auto 28px;
+  margin: 40px auto 24px;
   padding: 0 20px;
 }
 
-/* ── Card de cada liga ── */
+/* ── Card de liga ────────────────────────────────────────── */
 .liga-card {
   max-width: 860px;
-  margin: 0 auto 50px;
+  margin: 0 auto 48px;
   padding: 0 20px;
 }
 
 .liga-nome {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #7a5c3a;
+  color: var(--cafe-escuro);
   display: flex;
   align-items: center;
   gap: 9px;
   margin-bottom: 8px;
 }
 
-.liga-nome::before {
-  content: "🏆";
-  font-size: 1.1rem;
-}
+.liga-nome::before { content: "🏆"; font-size: 1rem; }
 
 .liga-info {
-  font-size: 0.88rem;
-  color: #9a8068;
-  margin-bottom: 6px;
-  line-height: 1.6;
+  font-size: 13px;
+  color: var(--texto-suave);
+  margin-bottom: 4px;
+  line-height: 1.55;
 }
 
-/* ── Form inline "entrar na liga" ── */
+/* ── Form entrar ─────────────────────────────────────────── */
 .form-entrar {
-  background: #fdfaf4;
-  border: 2px solid #ddd0b8;
-  border-radius: 14px;
-  padding: 22px 24px;
-  margin: 24px 0 32px;
-  box-shadow: 0 2px 8px rgba(160, 130, 90, 0.1);
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 20px 22px;
+  margin: 22px 0 30px;
+  box-shadow: 0 2px 8px rgba(160,130,90,.09);
   display: flex;
   gap: 12px;
   align-items: flex-end;
   flex-wrap: wrap;
 }
 
-.form-entrar .campo {
-  flex: 1;
-  min-width: 200px;
-  margin-bottom: 0;
-}
+.form-entrar .campo { flex: 1; min-width: 200px; margin-bottom: 0; }
 
-.form-entrar .campo label {
-  margin-bottom: 7px;
-}
-
-/* ── Subtítulos dos rankings ── */
+/* ── Rankings ────────────────────────────────────────────── */
 .ranking-titulo {
-  font-size: 0.85rem;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #b08a5a;
-  margin: 30px 0 12px;
+  letter-spacing: .1em;
+  color: var(--azul);
+  margin: 28px 0 12px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.ranking-titulo::after {
-  content: "";
-  flex: 1;
-  height: 2px;
-  background: #ddd0b8;
-  border-radius: 2px;
-}
+.ranking-titulo::after { content: ""; flex: 1; height: 2px; background: var(--borda); border-radius: 2px; }
 
-/* ── Tabelas de ranking ── */
+/* ── Tabela ──────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: #fdfaf4;
-  border: 2px solid #ddd0b8;
-  border-radius: 12px;
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(160, 130, 90, 0.09);
+  box-shadow: 0 2px 8px rgba(160,130,90,.08);
   margin-bottom: 10px;
 }
 
-table th,
-table td {
+table th, table td {
   padding: 12px 18px;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 14px;
   border-bottom: 1px solid #ede3d0;
 }
 
-table tr:last-child td {
-  border-bottom: none;
-}
+table tr:last-child td { border-bottom: none; }
 
 table thead th {
-  background: #ede3d0;
+  background: #eadbc9;
   font-weight: 800;
-  font-size: 0.78rem;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8a6844;
+  letter-spacing: .08em;
+  color: var(--cafe-medio);
 }
 
-table td:first-child,
-table th:first-child {
+table td:first-child, table th:first-child {
   width: 50px;
   text-align: center;
   font-weight: 700;
-  color: #c9a97a;
+  color: var(--vinho);
 }
 
-table tbody tr:first-child td:first-child {
-  color: #d4a84b;
-  font-size: 1.1rem;
-}
-table tbody tr:first-child td {
-  background: rgba(212, 168, 75, 0.07);
-}
-table tbody tr:hover td {
-  background: #f7f0e2;
-}
+table tbody tr:first-child td:first-child { color: var(--laranja); font-size: 1.1rem; }
+table tbody tr:first-child td             { background: rgba(251,162,86,.10); }
+table tbody tr:hover td                   { background: #f8eee3; }
 
-table td:last-child,
-table th:last-child {
-  font-weight: 700;
-  color: #7a5c3a;
-}
+table td:last-child, table th:last-child  { font-weight: 700; color: var(--cafe-escuro); }
 
-/* ── Estado vazio ── */
+/* ── Estado vazio ────────────────────────────────────────── */
 .vazio {
   text-align: center;
-  color: #b08a5a;
+  color: var(--cafe-medio);
   font-style: italic;
-  margin: 40px auto;
-  font-size: 1rem;
+  margin: 36px auto;
   max-width: 860px;
   padding: 0 20px;
 }
 
-/* ── Responsivo ── */
+/* ── Feedback inline ─────────────────────────────────────── */
+.msg-liga-erro { max-width: 860px; margin: 20px auto 0; padding: 0 20px; }
+.msg-liga-erro p { padding: 12px 18px; border-radius: var(--raio-sm); border-left: 4px solid var(--vinho); background: #fae0dc; color: var(--vinho); font-weight: 600; }
+
+/* ── Responsivo ──────────────────────────────────────────── */
 @media (max-width: 600px) {
-  h1 {
-    font-size: 1.5rem;
-  }
-  .modal {
-    padding: 28px 22px 24px;
-  }
-  .form-entrar {
-    flex-direction: column;
-  }
-}
-
-/* Tema compartilhado: café, vinho e azul como detalhe. */
-body {
-  background: #f4eadf;
-  color: #35251b;
-  padding-top: 56px;
-}
-
-body::before {
-  background: linear-gradient(90deg, #63452f, #fba256, #ab3535);
-}
-h1 {
-  color: #63452f;
-}
-h1::after {
-  color: #fba256;
-}
-.btn-primario {
-  background: #ab3535;
-  box-shadow: 0 3px 10px rgba(99, 69, 47, 0.3);
-}
-.btn-primario:hover {
-  background: #f44242;
-  box-shadow: 0 6px 16px rgba(171, 53, 53, 0.32);
-}
-.modal,
-.form-entrar,
-table {
-  background: #fffaf4;
-  border-color: #e2ccb4;
-}
-.modal-titulo,
-.liga-nome,
-table td:last-child,
-table th:last-child {
-  color: #63452f;
-}
-.campo label,
-.secao-titulo,
-table thead th {
-  color: #765238;
-}
-.campo input[type="text"],
-.campo input[type="date"] {
-  border-color: #e2ccb4;
-  background: #fffdf9;
-  color: #35251b;
-}
-.campo input:focus {
-  border-color: #ab3535;
-  box-shadow: 0 0 0 3px rgba(171, 53, 53, 0.16);
-}
-.ranking-titulo {
-  color: #4874bf;
-}
-.ranking-titulo::after {
-  background: #c0a484;
-}
-table thead th {
-  background: #eadbc9;
-}
-table td:first-child,
-table th:first-child {
-  color: #ab3535;
-}
-table tbody tr:first-child td:first-child {
-  color: #fba256;
-}
-table tbody tr:first-child td {
-  background: rgba(251, 162, 86, 0.12);
-}
-table tbody tr:hover td {
-  background: #f8eee3;
+  .liga-page-titulo { font-size: 1.4rem; padding-top: 28px; }
+  .modal { padding: 26px 20px 22px; }
+  .form-entrar { flex-direction: column; }
+  .acoes-topo { justify-content: stretch; }
+  .acoes-topo .btn-primario { flex: 1; justify-content: center; }
 }
