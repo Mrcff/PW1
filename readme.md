@@ -1,6 +1,6 @@
 # Café sem Fronteiras
 
-Sistema web de jogo de atendimento em restaurante, desenvolvido como projeto da disciplina de Programação Web 1.
+Sistema web de jogo de atendimento em restaurante, desenvolvido como projeto da disciplina de Desenvolvimento Web 1.
 
 O jogador assume o papel de um garçom e deve anotar corretamente os pedidos dos clientes, entregá-los na cozinha e manter as estrelas do restaurante antes que o tempo acabe. A cada nível, o cenário muda para um país diferente (Brasil, França, Japão ou Estados Unidos), aumentando o desafio progressivamente. O jogo conta com sistema de pontuação, ranking e ligas competitivas entre jogadores.
 
